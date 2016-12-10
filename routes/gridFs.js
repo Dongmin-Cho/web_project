@@ -7,13 +7,33 @@
 var mongoose = require('mongoose');
 var Grid = require('gridfs-stream');
 var fs = require('fs');
+var request = require('request');
+
+///////////////////////////////////////////////////////////////////
+////////////////////////////////////////////Download image from url
+//프로젝트 폴더에 filename으로 이미지가 저장된다.
+/*
+ downloadImageFromUrl('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
+ console.log('done');
+ });
+ */
+
+exports.downloadImageFromUrl = function(uri, filename, callback){
+    request.head(uri, function(err, res, body){
+        console.log('content-type:', res.headers['content-type']);
+        console.log('content-length:', res.headers['content-length']);
+
+        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+    });
+};
+
 
 ///////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////Insert file to database
 //url : 저장할 파일의 위치 - 어디서 불러올 것인지 (string)
 //filename : 저장할 파일의 이름(이 이름으로 저장됨)(string)
 //gfs : mongoose connection 객체(index.js -> var gfs = Grid(conn.db);
-exports.WriteFile = function (url, filename, gfs) {
+exports.WriteFile = function (url, filename, gfs, callback) {
     console.log('WriteFile Start');
 
     //디비에 저장할 파일 이름 지정
@@ -30,6 +50,8 @@ exports.WriteFile = function (url, filename, gfs) {
         //do something with file
         console.log(file.filename+' written to DB');
     });
+
+    callback();
 };
 
 
@@ -52,6 +74,26 @@ exports.ReadFile = function (filename, inmongoname, gfs) {
         console.log('file has been written fully!');
     });
 };
+
+///////////////////////////////////////////////////////////////////
+//Save img from url and transfer it to db and delete original img file
+exports.saveIMG = function (url, filename, gfs, callback) {
+
+
+    //var imageName = url.replace(/^.*\//, '');
+
+    this.downloadImageFromUrl(url, filename, callback);
+    console.log('difu done');
+    this.WriteFile("./"+filename, filename, gfs);
+    console.log('wf done');
+    fs.unlink(filename, function (err) {
+        if(err) console.log(err);
+        console.log('saveIMG done well');
+    });
+};
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////
@@ -80,9 +122,9 @@ exports.DeleteFile = function(inmongoname, gfs){
 //gfs: gfs 객체
 //사용예:
 /*gridFs.ReturnImageSource('cat.jbg', gfs, function (img) {
-    var img64 = img;
-    res.render('index', {title: 'GridFS', img: img64});
-});*/
+ var img64 = img;
+ res.render('index', {title: 'GridFS', img: img64});
+ });*/
 
 exports.ReturnImageSource = function (filename, gfs, callback) {
     //write content to file system
@@ -93,7 +135,7 @@ exports.ReturnImageSource = function (filename, gfs, callback) {
             var readStream = gfs.createReadStream({filename: filename});
             var bufs = [];
             readStream.on('data', function(chunk){
-              bufs.push(chunk);
+                bufs.push(chunk);
             }).on('end', function(){
                 var fbuf = Buffer.concat(bufs);
                 var base64 = (fbuf.toString('base64'));

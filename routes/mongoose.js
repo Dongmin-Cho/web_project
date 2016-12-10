@@ -1,152 +1,138 @@
 /**
- * Created by Seo on 2016-12-08.
- */
-/**
- * Modulized GridFs ...
+ * Created by Seo on 2016-12-10.
  */
 var mongoose = require('mongoose');
-var Grid = require('gridfs-stream');
-var fs = require('fs');
-var request = require('request');
+mongoose.Promise = global.Promise;
 
-///////////////////////////////////////////////////////////////////
-////////////////////////////////////////////Download image from url
-//프로젝트 폴더에 filename으로 이미지가 저장된다.
-/*
- downloadImageFromUrl('https://www.google.com/images/srpr/logo3w.png', 'google.png', function(){
- console.log('done');
- });
- */
+//사용자 스키마
+var UserSchema = mongoose.Schema({
+    userId : String,            //사용자 id
+    password : String,          //비밀번호
+    materials : [String],       //가지고 있는 재료
+    uploaded : [String],        //올린 글 목록(글의 _id)
+    recommended : [String],     //추천한 글 목록(레시피의 _id)
+    commented : [String],       //작성한 댓글 목록(댓글의 _id)
+    signUpDate : {type: Date, default: Date.now}  //가입일
+});
+var Users = mongoose.model('Users', UserSchema);
 
-exports.downloadImageFromUrl = function(uri, filename, callback){
-    request.head(uri, function(err, res, body){
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
+//레시피 스키마
+var RecipeSchema = mongoose.Schema({
+    userId : String,             //작성자
+    recipeName: String,         //요리 이름
+    recipe : String,            //조리법
+    recommend : Number,         //추천수
+    comment : [{id: String,     //댓글(작성자 id, 댓글 내용, 작성일)
+        content : String,
+        writeDate : {type: Date, default: Date.now}}],
+    image : String              // 이미지의 파일 이름
+});
+var Recipes = mongoose.model('Recipes', RecipeSchema);
 
-        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-    });
-};
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////사용자 등록
+//가입할 때 id를 비교하여 중복 id가 있을 경우 가입 시퀀스를 새로 시작해야 한다
+//가입 시퀀스를 재시작할 때 기존 입력을 남겨두어야 하나? - id랑 비번만 받으니 딱히 필요 없을듯
+//비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
+exports.signUpUser = function(id, pw){
 
-
-///////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////Insert file to database
-//url : 저장할 파일의 위치 - 어디서 불러올 것인지 (string)
-//filename : 저장할 파일의 이름(이 이름으로 저장됨)(string)
-//gfs : mongoose connection 객체(index.js -> var gfs = Grid(conn.db);
-exports.WriteFile = function (url, filename, gfs, callback) {
-    console.log('WriteFile Start');
-
-    //디비에 저장할 파일 이름 지정
-    var writeStream = gfs.createWriteStream({
-        filename: filename
-    });
-    console.log('writeStream done');
-
-    //읽을 파일 불러오기 (실제 시스템에서는 url이나 param, req 등으로 넘어온 객체가 될 것)
-    fs.createReadStream(url).pipe(writeStream);
-    console.log('createReadStream done');
-
-    writeStream.on('close', function (file) {
-        //do something with file
-        console.log(file.filename+' written to DB');
-    });
-
-    callback();
-};
-
-
-///////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////Read file from database
-//현재 프로젝트의 루트에 파일이 생성됨
-//filename: 저장될 파일의 이름(이 이름으로 저장된다.)
-//inmongoname: db안에서 찾을 파일의 이름
-//gfs: gfs 객체
-exports.ReadFile = function (filename, inmongoname, gfs) {
-    //write content to file system
-    var fs_write_stream = fs.createWriteStream(filename);
-
-    //read from mongodb
-    var readStream = gfs.createReadStream({
-        filename: inmongoname
-    });
-    readStream.pipe(fs_write_stream);
-    fs_write_stream.on('close', function () {
-        console.log('file has been written fully!');
-    });
-};
-
-///////////////////////////////////////////////////////////////////
-//Save img from url and transfer it to db and delete original img file
-exports.saveIMG = function (url, filename, gfs, callback) {
-
-
-    //var imageName = url.replace(/^.*\//, '');
-
-    this.downloadImageFromUrl(url, filename, callback);
-    console.log('difu done');
-    this.WriteFile("./"+filename, filename, gfs);
-    console.log('wf done');
-    fs.unlink(filename, function (err) {
-        if(err) console.log(err);
-        console.log('saveIMG done well');
-    });
-};
-
-
-
-
-
-///////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////Delete file from database
-//inmongoname: 지울 파일의 이름(db 안에 있는)
-//gfs: gfs 객체
-exports.DeleteFile = function(inmongoname, gfs){
-    gfs.remove({
-        filename: inmongoname
-    }, function (err) {
-        if (err) return handleError(err);
-        console.log('success');
-    });
-};
-
-
-///////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////Read file from database
-//홈페이지에 이미지 렌더할 객체 생성
-//gridfs를 이용할 경우 파일을 chunk로 나누어 저장하므로 이미지를 웹에
-//바로 출력할 수 없다. 따라서 버퍼에 담아 이어붙인 후 RFC2397의
-//데이터 URI 스킴을 이용한다.
-//
-//데이터 처리에 시간이 걸리므로 동기 처리가 필요하다
-//filename: 로드할 파일 이름(쿼리를 _id와 같이 변경할 수도 있다)
-//gfs: gfs 객체
-//사용예:
-/*gridFs.ReturnImageSource('cat.jbg', gfs, function (img) {
- var img64 = img;
- res.render('index', {title: 'GridFS', img: img64});
- });*/
-
-exports.ReturnImageSource = function (filename, gfs, callback) {
-    //write content to file system
-    gfs.files.find({filename: filename}).toArray(function(err, files) {
-        if (err) console.log(err);
-        console.log(files);
-        if (files.length > 0) {
-            var readStream = gfs.createReadStream({filename: filename});
-            var bufs = [];
-            readStream.on('data', function(chunk){
-                bufs.push(chunk);
-            }).on('end', function(){
-                var fbuf = Buffer.concat(bufs);
-                var base64 = (fbuf.toString('base64'));
-                console.log('file string will be returned');
-                //console.log(base64);
-
-                callback(base64);
-                return base64;
-            })
-        } else {
-            console.log('file not found error');
+    Users.find({'userId': id}, function (err, users) {
+        if(users.length>0){
+            console.log('same id already exist');
+            return err;
         }
-    })
+        //사용자 등록
+        else{
+            var user = new User({'userId': id, 'password':pw});
+            user.save(function (err) {
+                if(err) res.status(500).send('사용자 등록 오류');
+            });
+            console.log('new user registered');
+        }
+    });
 };
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////사용자 탈퇴
+//사용자 정보 메뉴에서 탈퇴 메뉴를 보여준다.
+//탈퇴 시도시 비번을 한번 더 물어본다
+//
+exports.leaveUser = function(id, pw){
+
+
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 등록
+//id : 작성자 id
+//name : 레시피 이름
+//recipe : 조리 방법
+//image : url (일단)
+//gfs : object
+exports.uploadRecipe = function(id, name, recipe, image, gfs){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 수정
+//이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?
+exports.updateRecipe = function(id, name, recipe, image){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 삭제
+//삭제 권한 : 관리자 혹은 작성자 본인
+//애초에 삭제 버튼을 관리자나 작성자에게만 보여주거나
+//삭제시 체크하는 것이 필요
+exports.deleteRecipe = function (userid, _id) {
+
+
+};
+
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////댓글 등록
+//댓글 삭제 기능이 필요한가?
+exports.addComment = function(id, title, content){
+
+};
+
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////재료 세팅
+//재료는 배열로 받는 것이 좋을듯
+//따로 등록, 수정을 나누지 않고 radio 타입 input으로 받아서 매번 수정
+exports.updateMaterial = function(id, materials){
+
+};
+
+
+////////////////////////////////////////////////////////////
+//////////////////////////////////////////////게시판 글 등록
+//사용자들이 이미지를 첨부하고 싶다면?
+exports.postWriting = function(id, title, content){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////게시판 글 삭제
+exports.deleteWriting = function (userid, _id) {
+
+};
+
+////////////////////////////////////////////////////////////
+//////////////////////////////////////////////게시판 글 검색
+//검색 분류를 여러 개 할 필요?
+//작성자 id로 검색, 제목으로 검색, 내용으로 검색
+
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 검색
+//검색에 대한 구체적 구상이 필요
+
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
