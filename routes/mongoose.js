@@ -1,0 +1,132 @@
+/**
+ * Created by Seo on 2016-12-10.
+ */
+var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
+//사용자 스키마
+var UserSchema = mongoose.Schema({
+    userId : String,            //사용자 id
+    password : String,          //비밀번호
+    materials : [String],       //가지고 있는 재료
+    uploaded : [String],        //올린 글 목록(글의 _id)
+    recommended : [String],     //추천한 글 목록(레시피의 _id)
+    commented : [String],       //작성한 댓글 목록(댓글의 _id)
+    signUpDate : {type: Date, default: Date.now}  //가입일
+});
+var Users = mongoose.model('Users', UserSchema);
+
+//레시피 스키마
+var RecipeSchema = mongoose.Schema({
+    userId : String,             //작성자
+    recipeName: String,         //요리 이름
+    recipe : String,            //조리법
+    recommend : Number,         //추천수
+    comment : [{id: String,     //댓글(작성자 id, 댓글 내용, 작성일)
+        content : String,
+        writeDate : {type: Date, default: Date.now}}],
+    image : String              // 이미지의 파일 이름
+});
+var Recipes = mongoose.model('Recipes', RecipeSchema);
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////사용자 등록
+//가입할 때 id를 비교하여 중복 id가 있을 경우 가입 시퀀스를 새로 시작해야 한다
+//가입 시퀀스를 재시작할 때 기존 입력을 남겨두어야 하나? - id랑 비번만 받으니 딱히 필요 없을듯
+//비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
+exports.signUpUser = function(id, pw){
+
+    Users.find({'userId': id}, function (err, users) {
+       if(users.length>0){
+           console.log('same id already exist');
+           return err;
+       }
+        //사용자 등록
+        else{
+        var user = new User({'userId': id, 'password':pw});
+        user.save(function (err) {
+            if(err) res.status(500).send('사용자 등록 오류');
+        });
+        console.log('new user registered');
+       }
+    });
+};
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////사용자 탈퇴
+//사용자 정보 메뉴에서 탈퇴 메뉴를 보여준다.
+//탈퇴 시도시 비번을 한번 더 물어본다
+//
+exports.leaveUser = function(id, pw){
+
+
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 등록
+exports.uploadRecipe = function(id, name, recipe, image, gfs){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 수정
+//이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?
+exports.updateRecipe = function(id, name, recipe, image){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 삭제
+//삭제 권한 : 관리자 혹은 작성자 본인
+//애초에 삭제 버튼을 관리자나 작성자에게만 보여주거나
+//삭제시 체크하는 것이 필요
+exports.deleteRecipe = function (userid, _id) {
+
+};
+
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////댓글 등록
+//댓글 삭제 기능이 필요한가?
+exports.addComment = function(id, title, content){
+
+};
+
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////재료 세팅
+//재료는 배열로 받는 것이 좋을듯
+//따로 등록, 수정을 나누지 않고 radio 타입 input으로 받아서 매번 수정
+exports.updateMaterial = function(id, materials){
+
+};
+
+
+////////////////////////////////////////////////////////////
+//////////////////////////////////////////////게시판 글 등록
+//사용자들이 이미지를 첨부하고 싶다면?
+exports.postWriting = function(id, title, content){
+
+};
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////게시판 글 삭제
+exports.deleteWriting = function (userid, _id) {
+
+};
+
+////////////////////////////////////////////////////////////
+//////////////////////////////////////////////게시판 글 검색
+//검색 분류를 여러 개 할 필요?
+//작성자 id로 검색, 제목으로 검색, 내용으로 검색
+
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////레시피 검색
+//검색에 대한 구체적 구상이 필요
+
+
+
+////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
