@@ -3,6 +3,9 @@ var router = express.Router();
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 var fs = require('fs');
+//var MemoryStream = require('memory-stream');
+var multer = require('multer');
+var request = require('request');
 
 var Schema = mongoose.schema;
 
@@ -19,109 +22,41 @@ var gfs = Grid(conn.db);
 var gridFs = require('./gridFs');
 //router.use('/gridFs', gridFs);
 
-
+var upload = multer({des: "./uploads"});
 conn.once('open', function () {
-
-    //gridFs.WriteFile('D:/2016/web/untitled9/public/images/cattest.jpg', 'cat.jbg', gfs);
-
-/*  console.log('gridfs open start');
-
-//디비에 저장할 파일 이름 지정
-  var writeStream = gfs.createWriteStream({
-    filename: 'test.jpg'
-  });
-  console.log('writeStream done');
-
-  //읽을 파일 불러오기 (실제 시스템에서는 url이나 param, req 등으로 넘어온 객체가 될 것)
-  fs.createReadStream('D:/2016/web/untitled9/public/images/cattest.jpg').pipe(writeStream);
-  console.log('createReadStream done');
-
-  writeStream.on('close', function (file) {
-    //do something with file
-    console.log(file.filename+' written to DB');
-  });*/
-
-
-/*
-  var fs_write_stream = fs.createWriteStream('testtest.jpg');
-
-//read from mongodb
-  var readStream = gfs.createReadStream({
-    filename: 'test.jpg'
-  });
-  readStream.pipe(fs_write_stream);
-  fs_write_stream.on('close', function () {
-    console.log('file has been written fully!');
-  });
-*/
-/*
-  gfs.remove({
-    filename: 'test.jpg'
-  }, function (err) {
-    if (err) return handleError(err);
-    console.log('success');
-  });
-*/
 
 });
 
 
 
-//write content to file system
 
+//url로부터 이미지를 다운로드한 뒤 디비에 넣고 다시 로컬파일 삭제
+var imgProcess = function(url, filename, callback){
+  gridFs.downloadImageFromUrl(url, filename, function () {
+    gridFs.WriteFile("./"+filename, filename, gfs, function () {
+      console.log('unlink start');
+      fs.unlink(filename, function (err) {
+        if(err) console.log(err);
+        console.log('unlink done well');
+      });
+    })
+  })
+};
 
 
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  var img1;
-  var img2;
+  // 이미지를 저장할 때
+  // 1. db에 저장
+//    imgProcess('http://cfile25.uf.tistory.com/image/244B354651DF67ED33F603', 'final2.jpg');
+//    res.send('TEST');
 
-  gridFs.ReturnImageSource('cat.jbg', gfs, function (img) {
-    img1= img;
-    gridFs.ReturnImageSource('cat.jbg', gfs, function (img) {
-      img2=img;
-      res.render('index', {title: 'GridFS', img1: img1, img2: img2});
-    })
-
-  });
-
-
-
-/*
-  gfs.files.find({filename: 'cat.jbg'}).toArray(function(err, files){
-    if(err) console.log(err);
-    console.log(files);
-    if(files.length>0) {
-      //var imgtype = 'image/jpeg';
-      //res.set('Content-Type', imgtype);
-
-      //var readStream = gfs.createReadStream({filename: 'cat.jbg'});
-      //readStream.pipe(res);
-
-      var readStream = gfs.createReadStream({filename: 'cat.jbg'});
-      var bufs = [];
-
-      readStream.on('data', function(chunk) {
-
-        bufs.push(chunk);
-
-      }).on('end', function() { // done
-
-        var fbuf = Buffer.concat(bufs);
-
-        var base64 = (fbuf.toString('base64'));
-
-        res.render('index', { title: 'GridFs Test', img: base64 });
-      });
-
-    } else{
-      res.json('File not found');
-    }
-  });
-*/
-
+  //2. db에 있는 것을 불러온다.
+  gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
+    res.render('index', {title: 'gridFs', img: img})
+  })
 });
 
 module.exports = router;
