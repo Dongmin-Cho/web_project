@@ -9,7 +9,7 @@
     <title><%=doc.recipeName%></title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <!-- <link rel="stylesheet" href="style.css" type="text/css"> -->
+    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css">
 </head>
 
 <body>
@@ -28,7 +28,7 @@
             <form class="navbar-form navbar-right">
                 <div class="form-group">
                     <input class="form-control" type="text" placeholder="ID 님 환영합니다." readonly>
-                    <button type="submit" class="btn btn-success">My page</button>
+                    <button type="submit" class="btn btn-success"><a href="/userdata" style="color:white">My page</a></button>
                 </div>
             </form>
             <!--/.navbar-collapse -->
@@ -36,29 +36,49 @@
     </div>
 </nav>
 
-<div class="container-fluid jumbotron" style="margin-top: 15px">
+<div class="container-fluid jumbotron" style="margin-top: 25px">
     <div class="row">
-        <div class="col-xs-5" style="margin-left: 5px;">
-            <h1><%=doc.recipeName%></h1>
-            <p>작성자 : <i><%=doc.userId%></i></p>
-            <p>작성일 : <i><%=doc.date%></i></p>
+        <div class="col-xs-4 " style="margin-left: 15px;">
+            <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
+            <div style="margin-top: 80px; font-size: 27px;">작성자 : <i><%=doc.userId%>  </i> </div>
+            <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date%></i> </div>
         </div>
-        <div class="col-xs-2">
-            <div class="row">
-                <button class="btn btn-primary">추천!</button>
-            </div>
-            <div class="row">
-                <p>추천수: <%=doc.recommend%></p>
+
+        <div class="col-xs-2" style="margin-top:80px ">
+            <p >
+                <button type="button" class="btn btn-primary btn-lg"  >추 천 !</button>
+            </p>
+            <div class="row" style="margin-top:100px">
+                <p>추 천 수 : <%=doc.recommend%> </p>
             </div>
         </div>
         <div class="col-xs-5">
-            <img src="data:image/jpeg;base64, <%=doc.image%>">
+            <a data-toggle="modal" data-target="#myModal" >
+                <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px" >
+            </a>
+
+            <!-- 모달 팝업 -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px" >
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
+
     </div>
 </div>
 
 <div>
-    <p>재료</p>
+    <h2 style="text-align: left;"><strong>재료</strong></h2>
     <div>
         <%
         for(var m=0;m<doc.material.length;m++){
@@ -68,32 +88,45 @@
         }
         %>
     </div>
-    <p>조리법</p>
-    <p><%=doc.recipe%></p>
-
+    <h2 style="text-align: left;"><strong>조리법</strong></h2>
+    <% for(var s=0; s<recipeStr.length; s++){
+    %>
+    <p style="font-size : 18px;"><%=recipeStr[s]%></p>
+    <%
+    }
+    %>
 </div>
 
 <div>
-    <div><h2>댓글</h2></div>
-    <%if(doc.comment.length>0){
-    for(var i=0; i<doc.comment.length; i++){
-    %>
-    <div>
-        <p>작성자: <%=doc.comment[i].id%> 작성일: <%=doc.comment[i].writeDate%></p><button>댓글삭제</button></p>
+    <h2 style="text-align: left;"><strong>댓글</strong></h2>
+
+    <% if(doc.comment.length>0){ %>
+    <% for(var i=0; i<doc.comment.length; i++){ %>
+    <div class="col-md-5 col-md-offset-3">
+        <p style="font-size: 14px;"><strong style="font-size: 22px;"><%=doc.comment[i].writerId%> </strong> <%=doc.comment[i].writeDate%></p>
     </div>
-    <div>
-        <p><%=doc.comment[i].content%></p>
+    <div class="col-md-12" style="font-size: 17px">
+        <%=doc.comment[i].content%>
     </div>
+    <form method="post" action="/delete-comment/<%=doc.id%>">
+        <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
+
+        <input type="submit" class = "btn btn-danger btn-sm" value="덧글 지우기">
+    </form>
     <%
     }
     }%>
-    <div>
-        <form method="get" action="/recipe/:id/comment">
-            <input type="text" name="content" placeholder="Write your content">
-            <input type="submit" value="댓글 달기">
+    <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
+        <form style="font-size: 18px; margin-bottom: 15px;"   method="post" action="/comment">
+            <div class="col-sm-9">
+                <input type="text" class="form-control" name="content" placeholder="Write your comment">
+                <input type="hidden" name="recipeId" value="<%=doc.id%>">
+            </div>
+            <button type="submit" class="btn btn-defalut btn-md" >덧글 달기</button>
         </form>
     </div>
 </div>
+
 
 
 
@@ -103,5 +136,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </body>
+
 
 </html>
