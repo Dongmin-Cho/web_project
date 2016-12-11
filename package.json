@@ -1,5 +1,5 @@
 {
-  "name": "untitled9",
+  "name": "web_Project_Team_5",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -16,6 +16,7 @@
     "mongoose": "^4.7.1",
     "morgan": "~1.7.0",
     "multer": "^1.2.0",
+    "request": "^2.79.0",
     "serve-favicon": "~2.3.0",
     "shortid": "^2.2.6"
   }

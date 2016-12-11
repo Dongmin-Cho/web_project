@@ -4,6 +4,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+var store = new MongoDBStore({
+    uri: "mongodb://localhost:27017/data",
+
+    collection: 'session'
+});
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -13,6 +20,23 @@ var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+//using session
+app.use(session({
+    key: 'session_id',
+    secret: '!)@(#JODONGIMN*$T^&)',
+    resave: false,
+    store: store,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000*60*15 // valid cooke time 15min
+    }
+}));
+
+store.on('error', function(error) {
+    assert.ifError(error);
+    assert.ok(false);
+});
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

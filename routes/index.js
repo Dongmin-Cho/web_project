@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var router = express.Router();
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -39,8 +40,8 @@ var imgProcess = function(url, filename, callback){
         if(err) console.log(err);
         console.log('unlink done well');
       });
-    })
-  })
+    });
+  });
 };
 
 
@@ -55,8 +56,25 @@ router.get('/', function(req, res, next) {
 
   //2. db에 있는 것을 불러온다.
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-    res.render('index', {title: 'gridFs', img: img})
-  })
+    res.render('index', {title: 'gridFs', img: img});
+  });
+});
+
+/*get test*/
+router.get('/test', function(req, res) {
+    if (req.session.logined) { //has logined
+        res.render('main', {
+            userName: req.session.userId
+        });
+    } else {
+        res.render('main', {
+            userName: ''
+        });
+    }
+});
+
+router.post('/login', function(req, res) {
+
 });
 
 module.exports = router;
