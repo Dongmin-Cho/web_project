@@ -32,10 +32,9 @@ conn.once('open', function () {
 
 });
 
-
-
-
 //url로부터 이미지를 다운로드한 뒤 디비에 넣고 다시 로컬파일 삭제
+//imgProcess 함수는 gridFs에 들어갔음
+/*
 var imgProcess = function(url, filename, callback){
   gridFs.downloadImageFromUrl(url, filename, function () {
     gridFs.WriteFile("./"+filename, filename, gfs, function () {
@@ -47,7 +46,7 @@ var imgProcess = function(url, filename, callback){
     });
   });
 };
-
+*/
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -62,6 +61,7 @@ router.get('/', function(req, res, next) {
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
     res.render('index', {title: 'gridFs', img: img});
   });
+
 });
 
 /*get test -> to be in main*/
@@ -154,23 +154,32 @@ router.post('/logout', function(req, res) {
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
-  res.render('createrecipe', {userId: 'sample'});
+  var userId = req.session.userId
+  res.render('createrecipe', {userId: userId});
 });
 
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
+//재료 입력 추가
 router.post('/recipe-inserted', function(req, res, next){
   var userId = req.body.userId;
   var recipeName = req.body.recipeName;
   var recipe = req.body.recipe;
   var imageURL = req.body.image;
+  var materals = req.body.materials;
+
+  var mAry = materals.split(',');
 
 
+  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
 
-  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, imageURL, gfs, function (id) {
-    res.render('detailrecipe', {});
-  });
+    res.redirect('/recipe/'+id);
+    //res.render('detailrecipe', {});
+    //res.send('well done id: ' +id);
+  })
 });
 
+//이제 이건 테스트용으로만
+//나중에 지우자
 router.get('/recipe-detail', function (req, res, next) {
   var name = '엄청맛있는거';
   var id = 'tjdudwlsdl';
@@ -188,5 +197,24 @@ router.get('/recipe-detail', function (req, res, next) {
     commentDate: commentDate, comment: comment});
 });
 
+
+//recipe 정보 보기
+//레시피의 오브젝트아이디를 주소창에 치면 된다.->다른 페이지에서도 응용
+//레시피 삭제 구현 필요
+//레시피 댓글 구현 필요
+router.get('/recipe/:id', function (req, res, next) {
+  //res.send('this is '+req.params.id);
+  var recipeId = req.params.id;
+  console.log('param id: '+recipeId);
+
+  var doc = customMongoose.findDocByID(recipeId, function (recipe) {
+    /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
+     url: recipe.image, recommend: recipe.recommend, material: recipe.material,
+     recipe: recipe.recipe, comment: recipe.comment});*/
+    res.render('detailrecipe', {doc: recipe});
+  });
+
+
+});
 
 module.exports = router;
