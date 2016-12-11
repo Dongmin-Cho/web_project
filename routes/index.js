@@ -190,58 +190,6 @@ router.post('/recipe-inserted', function(req, res, next){
     });
 });
 
-<<<<<<< HEAD
-//이제 이건 테스트용으로만
-//나중에 지우자
-router.get('/recipe-detail', function(req, res, next) {
-    var name = '엄청맛있는거';
-    var id = 'tjdudwlsdl';
-    var date = 'now';
-    var url = 'http://cfile9.uf.tistory.com/image/227A6E3553A823C724F802';
-    var recommend = 77;
-    var material = '이거랑, 저거랑, 이것도';
-    var recipe = '이러저러하게 만들자';
-    var commentID = 'tjdudwlsdl';
-    var commentDate = 'now';
-    var comment = '블라블라블라';
-
-    res.render('detailrecipe', {
-        recipeName: name,
-        id: id,
-        date: date,
-        url: url,
-        recommend: recommend,
-        material: material,
-        recipe: recipe,
-        commentID: commentID,
-        commentDate: commentDate,
-        comment: comment
-    });
-});
-
-
-//recipe 정보 보기
-//레시피의 오브젝트아이디를 주소창에 치면 된다.->다른 페이지에서도 응용
-//레시피 삭제 구현 필요
-//레시피 댓글 구현 필요
-router.get('/recipe/:id', function(req, res, next) {
-    //res.send('this is '+req.params.id);
-    var recipeId = req.params.id;
-    console.log('param id: ' + recipeId);
-
-    var doc = customMongoose.findDocByID(recipeId, function(recipe) {
-        /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
-         url: recipe.image, recommend: recipe.recommend, material: recipe.material,
-         recipe: recipe.recipe, comment: recipe.comment});*/
-        res.render('detailrecipe', {
-            doc: recipe
-        });
-    });
-
-
-});
-
-=======
 //이미지 소스 변환 필요
 //
 //
@@ -260,7 +208,7 @@ router.get('/recipe/:id', function (req, res, next) {
       var str = recipeDoc.recipe.split('\r\n');
 
       res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
-    })
+    });
   });
 });
 
@@ -277,7 +225,7 @@ router.post('/comment', function (req, res, next) {
 
   customMongoose.addComment(recipeId, writerId, content, function () {
     res.redirect('/recipe/'+recipeId);
-  })
+  });
 
 });
 
@@ -293,7 +241,7 @@ router.post('/delete-comment/:id', function(req, res, next){
 
   customMongoose.delComment(currentId, commentId, function () {
     res.redirect('/recipe/'+recipeId);
-  })
+  });
 });
 
 
@@ -320,6 +268,4 @@ router.get('/recipe-detail', function (req, res, next) {
     commentDate: commentDate, comment: comment});
 });
 
-
->>>>>>> 74686cf67b874bd6e86b9378204289d178ad71e4
 module.exports = router;
