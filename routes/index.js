@@ -66,6 +66,7 @@ router.get('/', function(req, res, next) {
 
 /*get test -> to be in main*/
 router.get('/test', function(req, res) {
+  console.log(req.session);
     if (req.session.logined) { //has logined
         res.render('main', {
             userName: req.session.userId
@@ -75,6 +76,20 @@ router.get('/test', function(req, res) {
             userName: ''
         });
     }
+});
+
+router.post('/checkDUP',function(req,res){
+  var id = req.body.id;
+  customMongoose.checkDuplicatedID(id,function(users){
+    res.writeHead(200, {
+        'Content-Type': 'text/plain'
+    });
+    if (users.length > 0) {
+        res.end('DUP');
+    } else {
+        res.end('VALID');
+    }
+  });
 });
 
 router.get('/signUp',function(req,res){
@@ -89,11 +104,44 @@ router.get('/signUp',function(req,res){
   }
 });
 router.post('/signUp',function(req,res){
-  customMongoose.signUpUser(req,res);
+  var id = req.body.id;
+  var pw = req.body.password;
+  var materials= req.body.materials;
+
+  console.log('post signup');
+  customMongoose.signUpUser(id,pw,materials,function(err){
+    if (err){
+    res.writeHead(500, {
+        'Content-Type': 'text/plain'
+    });
+    res.end('ERROR');
+  }else{
+    console.log('new user registered');
+    res.writeHead(200, {
+        'Content-Type': 'text/plain'
+    });
+    res.end('SUCCESS');
+  }
+  });
 });
 /*log in by jodongmin*/
 router.post('/login', function(req, res) {
-  customMongoose.login(req,res);
+  var id = req.body.id;
+  var pw = req.body.password;
+  console.log('----------------------login-------------------------');
+  customMongoose.login(id,pw,function(user){
+    if (user.length>0) {
+        /*login success, set session*/
+        req.session.regenerate(function() {
+            req.session.logined = true;
+            req.session.userId = user[0].userId;
+            res.redirect('/test');
+        });
+    }
+    else{
+      res.redirect('/loginFail');
+    }
+  });
 });
 
 /*log out by jodongmin*/

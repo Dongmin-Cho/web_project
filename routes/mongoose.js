@@ -50,30 +50,23 @@ var Comments = mongoose.model('Comments', CommentSchema);
 //가입할 때 id를 비교하여 중복 id가 있을 경우 가입 시퀀스를 새로 시작해야 한다
 //가입 시퀀스를 재시작할 때 기존 입력을 남겨두어야 하나? - id랑 비번만 받으니 딱히 필요 없을듯
 //비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
-exports.signUpUser = function(req, res) {
-    var id = req.body.id;
-    var pw = req.body.pw;
-    Users.find({
-        'userId': id
-    }, function(err, users) { // add req, res
-        if (users.length > 0) {
-            res.writeHead(200, {
-                'Content-Type': 'text/plain'
-            });
-            res.end('아이디가 중복되었습니다. 수정해주시기 바랍니다.');
-        }
-        //사용자 등록
-        else {
-            var user = new Users({
-                'userId': id,
-                'password': pw
-            });
-            user.save(function(err) {
-                if (err) res.status(500).send('사용자 등록 오류');
-            });
-            console.log('new user registered');
-        }
+exports.signUpUser = function(id, pw, mat, callback) {
+    var user = new Users({
+        'userId': id,
+        'password': pw,
+        'materials':mat
     });
+    user.save(function(err) {callback(err);});
+};
+//check duplicated by jodongmin
+exports.checkDuplicatedID = function(id,callback) {
+    Users.find({'userId':id},function(err,users){
+      if(err){
+        console.log('ERROR in check duplicated');
+      }else{
+        callback(users);
+      }
+  });
 };
 
 
@@ -91,29 +84,16 @@ exports.leaveUser = function(id, pw){
 /////////////////////////////////////////////////사용자 탈퇴
 //login
 //by jodongmin
-exports.login = function(req, res){
-  var id = req.body.id;
-  var pw = req.body.password;
+exports.login = function(id,pw,callback){
+
   Users.find({
       'userId': id,
       'password': pw
   },function(err,user){
-    if (user.length>0) {
-        /*login success, set session*/
-        req.session.regenerate(function() {
-            req.session.logined = true;
-            req.session.userId = user[0].userId;
-        });
-        res.writeHead(200, {
-            'Content-Type': 'text/plain'
-        });
-        res.end('/test');
-    }
-    else{
-      res.writeHead(200, {
-          'Content-Type': 'text/plain'
-      });
-      res.end('/loginFail');
+    if(err){
+      console.log('ERROR in login');
+    }else {
+      callback(user);
     }
   });
 };
