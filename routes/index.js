@@ -21,10 +21,14 @@ Grid.mongo = mongoose.mongo;
 var gfs = Grid(conn.db);
 
 var gridFs = require('./gridFs');
+var customMongoose = require('./mongoose');
+
 //router.use('/gridFs', gridFs);
 
 var upload = multer({des: "./uploads"});
 conn.once('open', function () {
+
+  //customMongoose.signUpUser('tjdudwlsdl', '1234');
 
 });
 
@@ -45,16 +49,16 @@ var imgProcess = function(url, filename, callback){
 };
 
 
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
   // 이미지를 저장할 때
   // 1. db에 저장
-//    imgProcess('http://cfile25.uf.tistory.com/image/244B354651DF67ED33F603', 'final2.jpg');
-//    res.send('TEST');
+  //gridFs.imgProcess('http://cfile25.uf.tistory.com/image/244B354651DF67ED33F603', 'final2.jpg', gfs);
+  //res.send('TEST');
 
   //2. db에 있는 것을 불러온다.
+
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
     res.render('index', {title: 'gridFs', img: img});
   });
@@ -76,5 +80,29 @@ router.get('/test', function(req, res) {
 router.post('/login', function(req, res) {
 
 });
+
+//레시피 입력 페이지
+router.get('/recipe-insert', function(req, res, next){
+  res.render('createrecipe', {userId: 'sample'});
+});
+
+//레시피 입력 페이지에서 서브밋 하면 여기로 온다
+router.post('/recipe-inserted', function(req, res, next){
+  var userId = req.body.userId;
+  var recipeName = req.body.recipeName;
+  var recipe = req.body.recipe;
+  var imageURL = req.body.image;
+
+
+
+  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, imageURL, gfs, function (id) {
+    res.send('Test is ok :'+id+ ' is inserted');
+  })
+
+
+
+});
+
+
 
 module.exports = router;

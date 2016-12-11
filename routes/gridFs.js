@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var Grid = require('gridfs-stream');
 var fs = require('fs');
 var request = require('request');
+var myGrid = require('./gridFs');
 
 ///////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////Download image from url
@@ -17,7 +18,7 @@ var request = require('request');
  console.log('done');
  });
  */
-
+//callback이 제대로 동작하지 않으면 함수 끝에 callback()을 넣어주자. 지금은 잘 됨.
 exports.downloadImageFromUrl = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
         console.log('content-type:', res.headers['content-type']);
@@ -148,5 +149,19 @@ exports.ReturnImageSource = function (filename, gfs, callback) {
         } else {
             console.log('file not found error');
         }
+    })
+};
+
+
+exports.imgProcess = function(url, filename, gfs, callback){
+    myGrid.downloadImageFromUrl(url, filename, function () {
+        myGrid.WriteFile("./"+filename, filename, gfs, function () {
+            console.log('unlink start');
+            fs.unlink(filename, function (err) {
+                if(err) console.log(err);
+                console.log('unlink done well');
+                callback();
+            });
+        })
     })
 };

@@ -7,12 +7,15 @@ var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 var ObjectID = require('mongodb').ObjectID; // to accecss collection's _id
 
+var gridFs = require('./gridFs');
+
 //사용자 스키마
 var UserSchema = mongoose.Schema({
     userId : String,            //사용자 id
     password : String,          //비밀번호
     materials : [String],       //가지고 있는 재료
     uploaded : [String],        //올린 글 목록(글의 _id)
+    uploadedRecipe : [String], //올린 레시피 목록
     recommended : [String],     //추천한 글 목록(레시피의 _id)
     commented : [String],       //작성한 댓글 목록(댓글의 _id)
     signUpDate : {type: Date, default: Date.now}  //가입일
@@ -56,7 +59,7 @@ exports.signUpUser = function(id, pw){
         }
         //사용자 등록
         else{
-            var user = new User({'userId': id, 'password':pw});
+            var user = new Users({'userId': id, 'password':pw});
             user.save(function (err) {
                 if(err) res.status(500).send('사용자 등록 오류');
             });
@@ -105,8 +108,36 @@ exports.login = function(id, pw, req, res){
 //recipe : 조리 방법
 //image : url (일단)
 //gfs : object
-exports.uploadRecipe = function(id, name, recipe, image, gfs){
+exports.uploadRecipe = function(id, name, recipe, image, gfs, callback){
 
+    //레시피 문서를 만든다
+    //레시피 문서의 _id를 파일 이름으로 한 이미지를 저장한다
+    //레시피 문서에 이미지의 _id를 추가한다
+    //레시피 문서의 _id를 사용자 문서에 추가한다(작성한 레시피 항목)
+
+    var recipeID;
+
+    var recipe = new Recipes({
+        'userId': id, 'recipeName': name, 'recipe': recipe});
+    recipe.save(function (err, recipeObject) {
+        if(err) console.log('recipe update error');
+        console.log('recipe upload done');
+        recipeID = recipeObject.id;
+        console.log('recipeID: '+recipeID);
+//'https://namu.moe/file/%ED%8C%8C%EC%9D%BC%3Aattachment/%EC%9D%BC%EB%B3%B8%20%EC%9A%94%EB%A6%AC/japanesefood.jpg'
+        gridFs.imgProcess(image, recipeID, gfs, function () {
+            console.log('img process done');
+            Recipes.update({_id: recipeID}, {$set:{image: recipeID}}, function(){
+                console.log('image name set done');
+                console.log('image : '+recipeID);
+                Users.update({userId: id}, {$push:{uploadedRecipe: recipeID}}, function () {
+                    console.log('push recipe done');
+                    console.log('recipe id: '+recipeID);
+                    callback(recipeID);
+                })
+            })
+        })
+    });
 };
 
 ////////////////////////////////////////////////////////////
