@@ -64,7 +64,7 @@ router.get('/', function(req, res, next) {
   });
 });
 
-/*get test*/
+/*get test -> to be in main*/
 router.get('/test', function(req, res) {
     if (req.session.logined) { //has logined
         res.render('main', {
@@ -77,6 +77,17 @@ router.get('/test', function(req, res) {
     }
 });
 
+router.get('/signUp',function(req,res){
+  if (req.session.logined) { //has logined
+      res.render('join', {
+          userName: req.session.userId
+      });
+  } else {
+      res.render('join', {
+          userName: ''
+      });
+  }
+});
 router.post('/signUp',function(req,res){
   customMongoose.signUpUser(req,res);
 });
