@@ -1,5 +1,4 @@
 var express = require('express');
-var session = require('express-session');
 var router = express.Router();
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -32,22 +31,6 @@ conn.once('open', function () {
 
 });
 
-//url로부터 이미지를 다운로드한 뒤 디비에 넣고 다시 로컬파일 삭제
-//imgProcess 함수는 gridFs에 들어갔음
-/*
-var imgProcess = function(url, filename, callback){
-  gridFs.downloadImageFromUrl(url, filename, function () {
-    gridFs.WriteFile("./"+filename, filename, gfs, function () {
-      console.log('unlink start');
-      fs.unlink(filename, function (err) {
-        if(err) console.log(err);
-        console.log('unlink done well');
-      });
-    });
-  });
-};
-*/
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
@@ -59,48 +42,17 @@ router.get('/', function(req, res, next) {
   //2. db에 있는 것을 불러온다.
 
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-    res.render('index', {title: 'gridFs', img: img});
+    res.render('index', {title: 'gridFs', img: img})
   });
 
-});
-
-/*get test*/
-router.get('/test', function(req, res) {
-    if (req.session.logined) { //has logined
-        res.render('main', {
-            userName: req.session.userId
-        });
-    } else {
-        res.render('main', {
-            userName: ''
-        });
-    }
-});
-
-router.post('/signUp',function(req,res){
-  customMongoose.signUpUser(req,res);
-});
-/*log in by jodongmin*/
-router.post('/login', function(req, res) {
-  customMongoose.login(req,res);
-});
-
-/*log out by jodongmin*/
-router.post('/logout', function(req, res) {
-  req.session.destroy(function(err){
-    if(err) console.error('err',err);
-    res.redirect('/test');
-  });
 });
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
-  var userId = req.session.userId
-  res.render('createrecipe', {userId: userId});
+  res.render('createrecipe', {userId: 'sample'});
 });
 
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
-//재료 입력 추가
 router.post('/recipe-inserted', function(req, res, next){
   var userId = req.body.userId;
   var recipeName = req.body.recipeName;
@@ -119,8 +71,67 @@ router.post('/recipe-inserted', function(req, res, next){
   })
 });
 
-//이제 이건 테스트용으로만
-//나중에 지우자
+//이미지 소스 변환 필요
+//
+//
+//
+//
+router.get('/recipe/:id', function (req, res, next) {
+  //res.send('this is '+req.params.id);
+  var recipeId = req.params.id;
+  console.log('param id: '+recipeId);
+
+  var doc = customMongoose.findDocByID(recipeId, function (recipeDoc) {
+    /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
+     url: recipe.image, recommend: recipe.recommend, material: recipe.material,
+     recipe: recipe.recipe, comment: recipe.comment});*/
+    gridFs.ReturnImageSource(recipeDoc.id, gfs, function (img) {
+      var str = recipeDoc.recipe.split('\r\n');
+
+      res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
+    })
+  });
+});
+
+//리콰이어 보낸 레시피에 댓글 추가하기
+router.post('/comment', function (req, res, next) {
+
+
+  var recipeId = req.body.recipeId;
+
+  //var writerId = req.session.userId
+  var writerId = 'tjdudwlsdl';
+
+  var content = req.body.content;
+
+  customMongoose.addComment(recipeId, writerId, content, function () {
+    res.redirect('/recipe/'+recipeId);
+  })
+
+});
+
+//해당 댓글 삭제하기
+router.post('/delete-comment/:id', function(req, res, next){
+
+  var recipeId = req.params.id;
+  console.log(recipeId);
+  var commentId = req.body.deleteCommentId;
+  console.log(commentId);
+  //var currentId = req.session.userId;
+  var currentId = 'tjdudwlsdl';
+
+  customMongoose.delComment(currentId, commentId, function () {
+    res.redirect('/recipe/'+recipeId);
+  })
+});
+
+
+router.get('/board', function(){
+  res.render('boardList',{});
+});
+
+
+
 router.get('/recipe-detail', function (req, res, next) {
   var name = '엄청맛있는거';
   var id = 'tjdudwlsdl';
@@ -138,24 +149,5 @@ router.get('/recipe-detail', function (req, res, next) {
     commentDate: commentDate, comment: comment});
 });
 
-
-//recipe 정보 보기
-//레시피의 오브젝트아이디를 주소창에 치면 된다.->다른 페이지에서도 응용
-//레시피 삭제 구현 필요
-//레시피 댓글 구현 필요
-router.get('/recipe/:id', function (req, res, next) {
-  //res.send('this is '+req.params.id);
-  var recipeId = req.params.id;
-  console.log('param id: '+recipeId);
-
-  var doc = customMongoose.findDocByID(recipeId, function (recipe) {
-    /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
-     url: recipe.image, recommend: recipe.recommend, material: recipe.material,
-     recipe: recipe.recipe, comment: recipe.comment});*/
-    res.render('detailrecipe', {doc: recipe});
-  });
-
-
-});
 
 module.exports = router;

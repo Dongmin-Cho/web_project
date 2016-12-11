@@ -1,11 +1,8 @@
 /**
  * Created by Seo on 2016-12-10.
  */
-var express = require('express');
-var session = require('express-session');
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-var ObjectID = require('mongodb').ObjectID; // to accecss collection's _id
 
 var gridFs = require('./gridFs');
 
@@ -20,31 +17,23 @@ var UserSchema = mongoose.Schema({
     commented : [String],       //작성한 댓글 목록(댓글의 _id)
     signUpDate : {type: Date, default: Date.now}  //가입일
 });
-var Users = mongoose.model('Users', UserSchema,'Users');
+var Users = mongoose.model('Users', UserSchema);
 
+var defaultImage; // 기본 이미지 아이디
 //레시피 스키마
 var RecipeSchema = mongoose.Schema({
     userId : String,             //작성자
+    date : {type: Date, default: Date.now}, //작성일
     recipeName: String,         //요리 이름
+    material : [String],        //재료
     recipe : String,            //조리법
-    recommend : Number,         //추천수
-    comment : [{id: String,     //댓글(작성자 id, 댓글 내용, 작성일)
+    recommend : {type: Number, default: 0},         //추천수
+    comment : [{writerId: String,     //댓글(작성자 id, 댓글 내용, 작성일)
         content : String,
         writeDate : {type: Date, default: Date.now}}],
-    image : String              // 이미지의 파일 이름
+    image : {type: String, default: defaultImage} // 이미지의 파일 이름(레시피 이름으로 저장)
 });
 var Recipes = mongoose.model('Recipes', RecipeSchema);
-
-
-//by jodongmin
-var CommentSchema = mongoose.Schema({
-    userId : String,
-    comment : {id : String,
-        title: String,
-        content : String,
-        writeDate : {type : Date, default : Date.now}}
-});
-var Comments = mongoose.model('Comments', CommentSchema);
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////사용자 등록
@@ -89,35 +78,6 @@ exports.leaveUser = function(id, pw){
 
 };
 
-/////////////////////////////////////////////////사용자 탈퇴
-//login
-//by jodongmin
-exports.login = function(req, res){
-  var id = req.body.id;
-  var pw = req.body.password;
-  Users.find({
-      'userId': id,
-      'password': pw
-  },function(err,user){
-    if (user.length>0) {
-        /*login success, set session*/
-        req.session.regenerate(function() {
-            req.session.logined = true;
-            req.session.userId = user[0].userId;
-        });
-        res.writeHead(200, {
-            'Content-Type': 'text/plain'
-        });
-        res.end('/test');
-    }
-    else{
-      res.writeHead(200, {
-          'Content-Type': 'text/plain'
-      });
-      res.end('/loginFail');
-    }
-  });
-};
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 등록
 //id : 작성자 id
@@ -125,7 +85,6 @@ exports.login = function(req, res){
 //recipe : 조리 방법
 //image : url (일단)
 //gfs : object
-//재료 항목 입력 추가
 exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callback){
 
     //레시피 문서를 만든다
@@ -177,6 +136,7 @@ exports.findDocByID = function (id, callback) {
 };
 
 
+
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
 //이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?
@@ -197,10 +157,37 @@ exports.deleteRecipe = function (userid, _id) {
 ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////댓글 등록
 //댓글 삭제 기능이 필요한가?
-//by jodongmin
-exports.addComment = function(id, title, content){
-    mongoose.Comments.insert({'id':id, comment : {'id': id, 'title':title, 'content':content}});
+//recipeId: 댓글이 들어갈 레시피의 오브젝트 아이디
+//writerId: 댓글 작성자의 아이디(세션으로 획득하자)
+//content: 댓글 내용
+//584d6731d5d267200c8a7477
+exports.addComment = function(recipeId, writerId, content, callback){
+    Recipes.update({_id: recipeId}, {$push: {comment: {writerId: writerId, content: content}}},
+        function () {
+            callback();
+        });
 };
+
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////댓글 삭제
+//어드민과 작성자만 삭제 가능하도록 하는 기능 추가 필요
+//인덱스.제이에스나 여기나 아무데나 추가해도 괜찮을듯
+exports.delComment = function (writerId, commentId, callback) {
+    Recipes.update({"comment": { $elemMatch : {'_id': commentId}}},
+        {$pull:{"comment": {'_id':commentId}}},function (err) {
+            if(err) console.log(err);
+            console.log('comment is deleted');
+            callback();
+        })
+};
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////추천수 올리기
+exprots.addRecommend = function(){
+
+};
+
+
 
 ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////재료 세팅
@@ -222,15 +209,15 @@ exports.postWriting = function(id, title, content){
 /////////////////////////////////////////////게시판 글 삭제
 //by jodongmin
 exports.deleteWriting = function (userid, _id) {
-  var doc = mongoose.RecipeSchema.find({'_id':ObjectID(_id)});
-  if(doc.userId === userId){//글의 작성자와 삭제 요청자가 같은 경우 삭제,
-    //관리자일 경우도 지울 수 있도록 추가하면 괜찮을 것 같음
-      mongoose.RecipeSchema.find({'_id':ObjectID(_id)}).remove().exec();
-      return true;
+    var doc = mongoose.RecipeSchema.find({'_id':ObjectID(_id)});
+    if(doc.userId === userId){//글의 작성자와 삭제 요청자가 같은 경우 삭제,
+        //관리자일 경우도 지울 수 있도록 추가하면 괜찮을 것 같음
+        mongoose.RecipeSchema.find({'_id':ObjectID(_id)}).remove().exec();
+        return true;
     }
-  else {//글의 작성자와 삭제 요청자가 다른 경우
-      return false;
-  }
+    else {//글의 작성자와 삭제 요청자가 다른 경우
+        return false;
+    }
 };
 
 ////////////////////////////////////////////////////////////
