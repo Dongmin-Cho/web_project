@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require('express-session');
 var router = express.Router();
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -35,8 +36,17 @@ conn.once('open', function () {
 
 
 //url로부터 이미지를 다운로드한 뒤 디비에 넣고 다시 로컬파일 삭제
-
-
+var imgProcess = function(url, filename, callback){
+  gridFs.downloadImageFromUrl(url, filename, function () {
+    gridFs.WriteFile("./"+filename, filename, gfs, function () {
+      console.log('unlink start');
+      fs.unlink(filename, function (err) {
+        if(err) console.log(err);
+        console.log('unlink done well');
+      });
+    });
+  });
+};
 
 
 /* GET home page. */
@@ -50,8 +60,37 @@ router.get('/', function(req, res, next) {
   //2. db에 있는 것을 불러온다.
 
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-    res.render('index', {title: 'gridFs', img: img})
-  })
+    res.render('index', {title: 'gridFs', img: img});
+  });
+});
+
+/*get test*/
+router.get('/test', function(req, res) {
+    if (req.session.logined) { //has logined
+        res.render('main', {
+            userName: req.session.userId
+        });
+    } else {
+        res.render('main', {
+            userName: ''
+        });
+    }
+});
+
+router.post('/signUp',function(req,res){
+  customMongoose.signUpUser(req,res);
+});
+/*log in by jodongmin*/
+router.post('/login', function(req, res) {
+  customMongoose.login(req,res);
+});
+
+/*log out by jodongmin*/
+router.post('/logout', function(req, res) {
+  req.session.destroy(function(err){
+    if(err) console.error('err',err);
+    res.redirect('/test');
+  });
 });
 
 //레시피 입력 페이지
@@ -70,7 +109,7 @@ router.post('/recipe-inserted', function(req, res, next){
 
   customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, imageURL, gfs, function (id) {
     res.render('detailrecipe', {});
-  })
+  });
 });
 
 router.get('/recipe-detail', function (req, res, next) {
