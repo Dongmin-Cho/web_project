@@ -83,9 +83,9 @@ exports.uploadRecipe = function(id, name, recipe, image, gfs, callback){
 
     var recipeID;
 
-    var recipe = new Recipes({
+    var newrecipe = new Recipes({
         'userId': id, 'recipeName': name, 'recipe': recipe});
-    recipe.save(function (err, recipeObject) {
+    newrecipe.save(function (err, recipeObject) {
         if(err) console.log('recipe update error');
         console.log('recipe upload done');
         recipeID = recipeObject.id;
