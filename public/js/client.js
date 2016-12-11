@@ -45,7 +45,6 @@ $(".login-info").keyup(function(event) {
 });
 
 function signUp() {
-    console.log();
     if (/중복[가-힇]*[\w]*[\d]*/.test($('#checkDUP').text())) {
         $('#signUp-id').focus();
         alert('ID가 유효하지 않습니다.');
@@ -54,7 +53,6 @@ function signUp() {
         $('#signUp-pw').focus();
         alert('하나 이상의 특수문자를 입력해주시고 비밀번호는 6~20글자 입니다.');
     } else {
-      console.log('???');
         var materials = $("input:checkbox:checked").map(function() {
             return $(this).val();
         }).get(); // get checked box value

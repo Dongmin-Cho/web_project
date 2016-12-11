@@ -35,7 +35,6 @@ var RecipeSchema = mongoose.Schema({
 });
 var Recipes = mongoose.model('Recipes', RecipeSchema);
 
-
 //by jodongmin
 var CommentSchema = mongoose.Schema({
     userId : String,
@@ -57,7 +56,14 @@ exports.signUpUser = function(id, pw, mat, callback) {
         'password': pw,
         'materials':mat
     });
-    user.save(function(err) {callback(err);});
+    user.save(function(err) {
+      if(err){
+        console.log("ERROR in save user's info");
+      }
+      else {
+      callback(err);
+      }
+    });//end save
 };
 //check duplicated by jodongmin
 exports.checkDuplicatedID = function(id,callback) {
@@ -105,8 +111,7 @@ exports.login = function(id,pw,callback){
 //recipe : 조리 방법
 //image : url (일단)
 //gfs : object
-//재료 항목 입력 추가
-exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callback){
+exports.uploadRecipe = function(id, name, recipe, image, gfs, callback){
 
     //레시피 문서를 만든다
     //레시피 문서의 _id를 파일 이름으로 한 이미지를 저장한다
@@ -115,14 +120,8 @@ exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callbac
 
     var recipeID;
 
-    var material_array = materials;
-
-    var count = material_array.length;
-
-    console.log(material_array[0]);
-
     var newrecipe = new Recipes({
-        'userId': id, 'recipeName': name, 'recipe': recipe, 'material': material_array});
+        'userId': id, 'recipeName': name, 'recipe': recipe});
     newrecipe.save(function (err, recipeObject) {
         if(err) console.log('recipe update error');
         console.log('recipe upload done');
@@ -138,24 +137,11 @@ exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callbac
                     console.log('push recipe done');
                     console.log('recipe id: '+recipeID);
                     callback(recipeID);
-                })
-            })
-        })
+                });
+            });
+        });
     });
 };
-
-
-////////////////////////////////////////////////////////////
-//////////////////Recipes 컬렉션 문서의 objectid로 문서 객체 반환
-exports.findDocByID = function (id, callback) {
-    Recipes.findOne({_id: id}, function(err, doc){
-        if(err) console.log(err);
-        console.log('find doc process: '+doc.id);
-        callback(doc);
-        return doc;
-    });
-};
-
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
