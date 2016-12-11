@@ -52,15 +52,14 @@ var Comments = mongoose.model('Comments', CommentSchema);
 //비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
 exports.signUpUser = function(req, res) {
     var id = req.body.id;
+    var pw = req.body.pw;
+    
     Users.find({
         'userId': id
     }, function(err, users) { // add req, res
         if (users.length > 0) {
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
-            });
-            req.on('data', function(chunk) {
-                console.log(chunk);
             });
             res.end('아이디가 중복되었습니다. 수정해주시기 바랍니다.');
         }
@@ -105,12 +104,17 @@ exports.login = function(req, res){
         req.session.regenerate(function() {
             req.session.logined = true;
             req.session.userId = user[0].userId;
-            console.log(req.session);
-            res.redirect('/test');
         });
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+        res.end('/test');
     }
     else{
-      res.redirect('/failLogin');//?를 사용해 get parameter로 message 보낼 예정
+      res.writeHead(200, {
+          'Content-Type': 'text/plain'
+      });
+      res.end('/loginFail');
     }
   });
 };
