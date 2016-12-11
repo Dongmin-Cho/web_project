@@ -53,7 +53,6 @@ var Comments = mongoose.model('Comments', CommentSchema);
 exports.signUpUser = function(req, res) {
     var id = req.body.id;
     var pw = req.body.pw;
-    
     Users.find({
         'userId': id
     }, function(err, users) { // add req, res

@@ -108,13 +108,26 @@ router.post('/recipe-inserted', function(req, res, next){
 
 
   customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, imageURL, gfs, function (id) {
-    res.send('Test is ok :'+id+ ' is inserted');
+    res.render('detailrecipe', {});
   });
-
-
-
 });
 
+router.get('/recipe-detail', function (req, res, next) {
+  var name = '엄청맛있는거';
+  var id = 'tjdudwlsdl';
+  var date = 'now';
+  var url = 'http://cfile9.uf.tistory.com/image/227A6E3553A823C724F802';
+  var recommend = 77;
+  var material = '이거랑, 저거랑, 이것도';
+  var recipe = '이러저러하게 만들자';
+  var commentID = 'tjdudwlsdl';
+  var commentDate = 'now';
+  var comment = '블라블라블라';
+
+  res.render('detailrecipe', {recipeName: name, id: id, date: date, url: url,
+    recommend: recommend, material: material, recipe: recipe, commentID: commentID,
+    commentDate: commentDate, comment: comment});
+});
 
 
 module.exports = router;

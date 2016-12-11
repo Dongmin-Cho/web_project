@@ -2,101 +2,83 @@
 <html>
 
 <head>
-	<link rel='stylesheet' href='/stylesheets/style.css' />
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Recipe Detail</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Recipe Detail</title>
 
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-  <!-- <link rel="stylesheet" href="style.css" type="text/css"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="style.css" type="text/css"> -->
 </head>
 
 <body>
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="/">자취생의 레시피</a>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<form class="navbar-form navbar-right">
-					<div class="form-group">
-						<input class="form-control" type="text" placeholder="ID 님 환영합니다." readonly>
-          <button type="submit" class="btn btn-success">My page</button>
-					</div>
-				</form>
-			<!--/.navbar-collapse -->
-        </div>
-    </nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-  <div class="jumbotron">
+<nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
-       <h1>레시피</h1>
-     </div>
-     <div class="form-group row">
-         <label for="example-text-input" class="col-xs-2 col-form-label">ID</label>
-       <div class="col-xs-10">
-         <input class="form-control" type="text" value="Id is id" id="example-text-input">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">자취생의 레시피</a>
         </div>
-     </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <form class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="ID 님 환영합니다." readonly>
+                    <button type="submit" class="btn btn-success">My page</button>
+                </div>
+            </form>
+            <!--/.navbar-collapse -->
+        </div>
+    </div>
+</nav>
 
-    <div class="form-group row">
-      <label for="example-search-input" class="col-xs-2 col-form-label">Password</label>
-      <div class="col-xs-10">
-        <input class="form-control" type="password" value="********" id="example-search-input">
-      </div>
+<div class="container-fluid jumbotron" style="margin-top: 15px">
+    <div class="row">
+        <div class="col-xs-5" style="margin-left: 5px;">
+            <h1><%=recipeName%></h1>
+            <p>작성자 : <i><%=id%></i></p>
+            <p>작성일 : <i><%=date%></i></p>
+        </div>
+        <div class="col-xs-2">
+            <div class="row">
+                <button class="btn btn-primary">추천!</button>
+            </div>
+            <div class="row">
+                <p>추천수: <%=recommend%></p>
+            </div>
+        </div>
+        <div class="col-xs-5">
+            <img src="<%=url%>">
+        </div>
     </div>
-    <div class="form-group row">
-      <label for="example-email-input" class="col-xs-2 col-form-label">materials</label>
-      <div class="col-xs-10">
-        <input class="form-control" type="text" value="재료목록" id="example-email-input">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label for="example-tel-input" class="col-xs-2 col-form-label">Upload</label>
-      <div class="col-xs-10">
-        <input class="form-control" type="text" value="올린 글 목록" id="example-tel-input">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label for="example-password-input" class="col-xs-2 col-form-label">recommended</label>
-      <div class="col-xs-10">
-      <input class="form-control" type="text" value="추천한 글 목록" id="example-password-input">
-    </div>
-  </div>
-  <div class="form-group row">
-    <label for="example-number-input" class="col-xs-2 col-form-label">commented</label>
-    <div class="col-xs-10">
-      <input class="form-control" type="text" value="작성한 댓글 목록" id="example-number-input">
-    </div>
-  </div>
-  <div class="form-group row">
-    <label for="example-datetime-local-input" class="col-xs-2 col-form-label">signUpDate</label>
-    <div class="col-xs-10">
-      <input class="form-control" type="-local" value="2016-12-11" id="example-datetime-local-input">
-    </div>
-  </div>
-
-  </div>
 </div>
 
+<div>
+    <p>재료</p>
+    <p><%=material%></p>
+    <p>조리법</p>
+    <p><%=recipe%></p>
 
-		<hr>
+</div>
 
-		<footer>
-			<p><p>
-		</footer>
-	</div>
-	<!-- /container -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<div>
+    <div><h2>댓글</h2></div>
+    <div><p>작성자: <%=commentID%> 작성일: <%=commentDate%><button>댓글 삭제</button></p></div>
+    <div><%=comment%></div>
+</div>
+
+<button>댓글 쓰기</button>
+
+
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<!-- /container -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>
