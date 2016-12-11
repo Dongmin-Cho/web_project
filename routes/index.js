@@ -160,6 +160,7 @@ router.post('/recipe-inserted', function(req, res, next) {
     var recipe = req.body.recipe;
     var imageURL = req.body.image;
     var materals = req.body.materials;
+    
   gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
     res.render('index', {title: 'gridFs', img: img});
   });

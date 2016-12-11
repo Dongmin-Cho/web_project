@@ -28,7 +28,7 @@
         <div id="navbar" class="navbar-collapse collapse">
             <div class="navbar-form navbar-right">
                 <div class="form-group">
-                    <p class="navbar-brand"><%=userId%> 님 환영합니다.</p>
+                    <p class="navbar-brand">jodong 님 환영합니다.</p>
                 </div>
                 <button type="button" class="btn btn-success" onclick="location.href='/mypage'">My page</button>
             </div>
@@ -60,7 +60,7 @@
         <div class="form-group row">
             <label for="example-text-input" class="col-xs-2 col-form-label">작성자</label>
             <div class="col-xs-10">
-                <input class="form-control" type="text" name="userId" value="<%=userId%>" id="example-text-input" readonly/>
+                <input class="form-control" type="text" name="userId" id="example-text-input" value='<%= userId %>' readonly/>
             </div>
         </div>
 
