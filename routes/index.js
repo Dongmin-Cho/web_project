@@ -77,8 +77,20 @@ router.get('/test', function(req, res) {
     }
 });
 
+router.post('/signUp',function(req,res){
+  customMongoose.signUpUser(req,res);
+});
+/*log in by jodongmin*/
 router.post('/login', function(req, res) {
+  customMongoose.login(req,res);
+});
 
+/*log out by jodongmin*/
+router.post('/logout', function(req, res) {
+  req.session.destroy(function(err){
+    if(err) console.error('err',err);
+    res.redirect('/test');
+  });
 });
 
 //레시피 입력 페이지
@@ -97,7 +109,7 @@ router.post('/recipe-inserted', function(req, res, next){
 
   customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, imageURL, gfs, function (id) {
     res.send('Test is ok :'+id+ ' is inserted');
-  })
+  });
 
 
 

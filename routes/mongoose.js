@@ -20,7 +20,7 @@ var UserSchema = mongoose.Schema({
     commented : [String],       //작성한 댓글 목록(댓글의 _id)
     signUpDate : {type: Date, default: Date.now}  //가입일
 });
-var Users = mongoose.model('Users', UserSchema);
+var Users = mongoose.model('Users', UserSchema,'Users');
 
 //레시피 스키마
 var RecipeSchema = mongoose.Schema({
@@ -50,18 +50,28 @@ var Comments = mongoose.model('Comments', CommentSchema);
 //가입할 때 id를 비교하여 중복 id가 있을 경우 가입 시퀀스를 새로 시작해야 한다
 //가입 시퀀스를 재시작할 때 기존 입력을 남겨두어야 하나? - id랑 비번만 받으니 딱히 필요 없을듯
 //비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
-exports.signUpUser = function(id, pw){
-
-    Users.find({'userId': id}, function (err, users, req, res) { // add req, res
-        if(users.length>0){
-            console.log('same id already exist');
-            return err;
+exports.signUpUser = function(req, res) {
+    var id = req.body.id;
+    Users.find({
+        'userId': id
+    }, function(err, users) { // add req, res
+        if (users.length > 0) {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            req.on('data', function(chunk) {
+                console.log(chunk);
+            });
+            res.end('아이디가 중복되었습니다. 수정해주시기 바랍니다.');
         }
         //사용자 등록
-        else{
-            var user = new Users({'userId': id, 'password':pw});
-            user.save(function (err) {
-                if(err) res.status(500).send('사용자 등록 오류');
+        else {
+            var user = new Users({
+                'userId': id,
+                'password': pw
+            });
+            user.save(function(err) {
+                if (err) res.status(500).send('사용자 등록 오류');
             });
             console.log('new user registered');
         }
@@ -83,23 +93,26 @@ exports.leaveUser = function(id, pw){
 /////////////////////////////////////////////////사용자 탈퇴
 //login
 //by jodongmin
-exports.login = function(id, pw, req, res){
-  var user = Users.find({
-      'id': id,
+exports.login = function(req, res){
+  var id = req.body.id;
+  var pw = req.body.password;
+  Users.find({
+      'userId': id,
       'password': pw
-  }).toArray();
-  if (user[0].id !== undefined) {
-      /*login success, set session*/
-      req.session.regenerate(function() {
-          req.session.logined = true;
-          req.session.userId = docs[0].id;
-          console.log(req.session);
-          res.redirect('/');
-      });
-  }
-  else{
-    res.redirect('/failLogin');//?를 사용해 get parameter로 message 보낼 예정
-  }
+  },function(err,user){
+    if (user.length>0) {
+        /*login success, set session*/
+        req.session.regenerate(function() {
+            req.session.logined = true;
+            req.session.userId = user[0].userId;
+            console.log(req.session);
+            res.redirect('/test');
+        });
+    }
+    else{
+      res.redirect('/failLogin');//?를 사용해 get parameter로 message 보낼 예정
+    }
+  });
 };
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 등록
@@ -117,9 +130,9 @@ exports.uploadRecipe = function(id, name, recipe, image, gfs, callback){
 
     var recipeID;
 
-    var recipe = new Recipes({
+    var newrecipe = new Recipes({
         'userId': id, 'recipeName': name, 'recipe': recipe});
-    recipe.save(function (err, recipeObject) {
+    newrecipe.save(function (err, recipeObject) {
         if(err) console.log('recipe update error');
         console.log('recipe upload done');
         recipeID = recipeObject.id;
@@ -134,9 +147,9 @@ exports.uploadRecipe = function(id, name, recipe, image, gfs, callback){
                     console.log('push recipe done');
                     console.log('recipe id: '+recipeID);
                     callback(recipeID);
-                })
-            })
-        })
+                });
+            });
+        });
     });
 };
 
