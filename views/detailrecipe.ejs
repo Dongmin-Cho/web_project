@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Recipe Detail</title>
+    <title><%=doc.recipeName%></title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <!-- <link rel="stylesheet" href="style.css" type="text/css"> -->
@@ -39,39 +39,62 @@
 <div class="container-fluid jumbotron" style="margin-top: 15px">
     <div class="row">
         <div class="col-xs-5" style="margin-left: 5px;">
-            <h1><%=recipeName%></h1>
-            <p>작성자 : <i><%=id%></i></p>
-            <p>작성일 : <i><%=date%></i></p>
+            <h1><%=doc.recipeName%></h1>
+            <p>작성자 : <i><%=doc.userId%></i></p>
+            <p>작성일 : <i><%=doc.date%></i></p>
         </div>
         <div class="col-xs-2">
             <div class="row">
                 <button class="btn btn-primary">추천!</button>
             </div>
             <div class="row">
-                <p>추천수: <%=recommend%></p>
+                <p>추천수: <%=doc.recommend%></p>
             </div>
         </div>
         <div class="col-xs-5">
-            <img src="<%=url%>">
+            <img src="data:image/jpeg;base64, <%=doc.image%>">
         </div>
     </div>
 </div>
 
 <div>
     <p>재료</p>
-    <p><%=material%></p>
+    <div>
+        <%
+        for(var m=0;m<doc.material.length;m++){
+        %>
+        <button class="btn btn-warning btn-sm"><%=doc.material[m]%></button>
+        <%
+        }
+        %>
+    </div>
     <p>조리법</p>
-    <p><%=recipe%></p>
+    <p><%=doc.recipe%></p>
 
 </div>
 
 <div>
     <div><h2>댓글</h2></div>
-    <div><p>작성자: <%=commentID%> 작성일: <%=commentDate%><button>댓글 삭제</button></p></div>
-    <div><%=comment%></div>
+    <%if(doc.comment.length>0){
+    for(var i=0; i<doc.comment.length; i++){
+    %>
+    <div>
+        <p>작성자: <%=doc.comment[i].id%> 작성일: <%=doc.comment[i].writeDate%></p><button>댓글삭제</button></p>
+    </div>
+    <div>
+        <p><%=doc.comment[i].content%></p>
+    </div>
+    <%
+    }
+    }%>
+    <div>
+        <form method="get" action="/recipe/:id/comment">
+            <input type="text" name="content" placeholder="Write your content">
+            <input type="submit" value="댓글 달기">
+        </form>
+    </div>
 </div>
 
-<button>댓글 쓰기</button>
 
 
 
