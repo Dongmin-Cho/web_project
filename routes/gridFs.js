@@ -54,8 +54,6 @@ exports.WriteFile = function (url, filename, gfs, callback) {
 
     callback();
 };
-
-
 ///////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////Read file from database
 //현재 프로젝트의 루트에 파일이 생성됨
@@ -128,11 +126,15 @@ exports.DeleteFile = function(inmongoname, gfs){
  });*/
 
 exports.ReturnImageSource = function (filename, gfs, callback) {
+    console.log('return image source check start');
+    console.log('filename: '+filename);
+
     //write content to file system
-    gfs.files.find({filename: filename}).toArray(function(err, files) {
+    //////////////////////////////////////////////////////////////
+    gfs.files.find({filename: filename}).toArray(function(err, file) {
         if (err) console.log(err);
-        console.log(files);
-        if (files.length > 0) {
+        console.log('file found check: '+file);
+        if (file.length > 0) {
             var readStream = gfs.createReadStream({filename: filename});
             var bufs = [];
             readStream.on('data', function(chunk){
