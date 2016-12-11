@@ -27,8 +27,7 @@ var customMongoose = require('./mongoose');
 var upload = multer({des: "./uploads"});
 conn.once('open', function () {
 
-  //customMongoose.signUpUser('tjdudwlsdl', '1234');
-
+  //customMongoose.signUpTest('tjdudwlsdl', '1234');
 });
 
 /* GET home page. */
@@ -41,10 +40,9 @@ router.get('/', function(req, res, next) {
 
   //2. db에 있는 것을 불러온다.
 
-  gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-    res.render('index', {title: 'gridFs', img: img})
-  });
-
+  // gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
+  // res.render('index', {title: 'gridFs', img: img})
+  //})
 });
 
 //레시피 입력 페이지
@@ -61,10 +59,11 @@ router.post('/recipe-inserted', function(req, res, next){
   var materals = req.body.materials;
 
   var mAry = materals.split(',');
+  console.log('material array: '+mAry);
 
 
   customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
-
+    console.log('uploadRecipe check');
     res.redirect('/recipe/'+id);
     //res.render('detailrecipe', {});
     //res.send('well done id: ' +id);
@@ -81,13 +80,15 @@ router.get('/recipe/:id', function (req, res, next) {
   var recipeId = req.params.id;
   console.log('param id: '+recipeId);
 
-  var doc = customMongoose.findDocByID(recipeId, function (recipeDoc) {
+  var doc = customMongoose.findDocByID(recipeId, function(recipeDoc) {
     /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
      url: recipe.image, recommend: recipe.recommend, material: recipe.material,
      recipe: recipe.recipe, comment: recipe.comment});*/
-    gridFs.ReturnImageSource(recipeDoc.id, gfs, function (img) {
+    console.log('findbyid check: '+recipeDoc.id);
+    gridFs.ReturnImageSource(recipeDoc.id, gfs, function(img) {
       var str = recipeDoc.recipe.split('\r\n');
-
+      console.log('split test '+str[0]);
+      console.log('split test '+str[1]);
       res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
     })
   });
@@ -125,9 +126,12 @@ router.post('/delete-comment/:id', function(req, res, next){
   })
 });
 
+router.post('/recommend', function (req, res, next) {
+  var recipeId = req.body.recipeId;
 
-router.get('/board', function(){
-  res.render('boardList',{});
+  customMongoose.addRecommend(recipeId, 'tjdudwlsdl', function () {
+    redirect()
+  })
 });
 
 

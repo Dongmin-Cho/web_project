@@ -45,9 +45,12 @@
         </div>
 
         <div class="col-xs-2" style="margin-top:80px ">
-            <p >
-                <button type="button" class="btn btn-primary btn-lg"  >추 천 !</button>
-            </p>
+            <form method="post", action="/recommend">
+                <p>
+                    <input type="hidden" name="recipeId" value="<%=doc.id%>">
+                    <input type="submit" class="btn btn-primary btn-lg" value="추천!">
+                </p>
+            </form>
             <div class="row" style="margin-top:100px">
                 <p>추 천 수 : <%=doc.recommend%> </p>
             </div>

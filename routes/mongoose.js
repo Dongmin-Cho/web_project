@@ -14,7 +14,7 @@ var UserSchema = mongoose.Schema({
     uploaded : [String],        //올린 글 목록(글의 _id)
     uploadedRecipe : [String], //올린 레시피 목록
     recommended : [String],     //추천한 글 목록(레시피의 _id)
-    commented : [String],       //작성한 댓글 목록(댓글의 _id)
+//    commented : [String],       //작성한 댓글 목록(댓글의 _id)
     signUpDate : {type: Date, default: Date.now}  //가입일
 });
 var Users = mongoose.model('Users', UserSchema);
@@ -28,6 +28,7 @@ var RecipeSchema = mongoose.Schema({
     material : [String],        //재료
     recipe : String,            //조리법
     recommend : {type: Number, default: 0},         //추천수
+    recommendList : [String],   //추천인 목록(중복 추천 방지에만 사용)
     comment : [{writerId: String,     //댓글(작성자 id, 댓글 내용, 작성일)
         content : String,
         writeDate : {type: Date, default: Date.now}}],
@@ -66,6 +67,18 @@ exports.signUpUser = function(req, res) {
     });
 };
 
+
+
+exports.signUpTest = function(id, pw) {
+    var user = new Users({
+        'userId': id,
+        'password': pw
+    });
+    user.save(function(err) {
+        if (err) res.status(500).send('사용자 등록 오류');
+    });
+    console.log('new user registered');
+};
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////사용자 탈퇴
@@ -183,7 +196,18 @@ exports.delComment = function (writerId, commentId, callback) {
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////추천수 올리기
-exprots.addRecommend = function(){
+exports.addRecommend = function(userId, recipeId, callback){
+
+    //레시피에 추천 아이디 목록을 만든다(스키마 추가)
+    //추천하면 임베디드 도큐먼트에 아이디가 추가된다
+    //추천할 때 임베디드 도큐먼트에 아이디가 있으면 추천할 수 없다(중복 추천 방지)
+    //추천하면 사용자 스키마의 추천글 리스트에 해당 레시피 오브젝트 아이디를 추가해준다
+
+    //Recipes.update({_id: recipeId, recommendList:{$ne:userId}}, {})
+
+    Recipes.update({_id: recipeId}, {$inc: {recommend: 1}}, function () {
+        callback();
+    });
 
 };
 
