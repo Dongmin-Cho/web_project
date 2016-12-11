@@ -10,7 +10,14 @@ a {
 .user-info{
   color: white;
 }
+.login-div{
+  width: 50%;
+  margin: 25%;
+}
+.login-body{
+  text-align: center;
 
+}
 .checkbox-inline{
   width:10%;
 }
