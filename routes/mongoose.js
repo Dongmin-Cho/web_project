@@ -41,56 +41,59 @@ var Recipes = mongoose.model('Recipes', RecipeSchema);
 //가입할 때 id를 비교하여 중복 id가 있을 경우 가입 시퀀스를 새로 시작해야 한다
 //가입 시퀀스를 재시작할 때 기존 입력을 남겨두어야 하나? - id랑 비번만 받으니 딱히 필요 없을듯
 //비밀번호 복잡도 파악하여 일정 이상의 복잡도를 가진 비번만 등록 가능하게 - api가 있는지 확인 필요
-exports.signUpUser = function(req, res) {
-    var id = req.body.id;
-    var pw = req.body.pw;
-    Users.find({
-        'userId': id
-    }, function(err, users) { // add req, res
-        if (users.length > 0) {
-            res.writeHead(200, {
-                'Content-Type': 'text/plain'
-            });
-            res.end('아이디가 중복되었습니다. 수정해주시기 바랍니다.');
-        }
-        //사용자 등록
-        else {
-            var user = new Users({
-                'userId': id,
-                'password': pw
-            });
-            user.save(function(err) {
-                if (err) res.status(500).send('사용자 등록 오류');
-            });
-            console.log('new user registered');
-        }
-    });
-};
-
-
-
-exports.signUpTest = function(id, pw) {
+exports.signUpUser = function(id, pw, mat, callback) {
     var user = new Users({
         'userId': id,
-        'password': pw
+        'password': pw,
+        'materials':mat
     });
     user.save(function(err) {
-        if (err) res.status(500).send('사용자 등록 오류');
-    });
-    console.log('new user registered');
+      if(err){
+        console.log("ERROR in save user's info");
+      }
+      else {
+        console.log(id+pw+mat);
+      callback(err);
+      }
+    });//end save
 };
+//check duplicated by jodongmin
+exports.checkDuplicatedID = function(id,callback) {
+    Users.find({'userId':id},function(err,users){
+      if(err){
+        console.log('ERROR in check duplicated');
+      }else{
+        callback(users);
+      }
+  });
+};
+
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////사용자 탈퇴
 //사용자 정보 메뉴에서 탈퇴 메뉴를 보여준다.
 //탈퇴 시도시 비번을 한번 더 물어본다
 //
-exports.leaveUser = function(id, pw){
-
-
-
+exports.leaveUser = function(id, pw, callback){
+    Users.find({'userId':id, 'password':pw}).remove(callback());
 };
 
+/////////////////////////////////////////////////사용자 탈퇴
+//login
+//by jodongmin
+exports.login = function(id,pw,callback){
+
+  Users.find({
+      'userId': id,
+      'password': pw
+  },function(err,user){
+    if(err){
+      console.log('ERROR in login');
+    }else {
+      callback(user);
+    }
+  });
+};
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 등록
 //id : 작성자 id
@@ -136,7 +139,6 @@ exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callbac
     });
 };
 
-
 ////////////////////////////////////////////////////////////
 //////////////////Recipes 컬렉션 문서의 objectid로 문서 객체 반환
 exports.findDocByID = function (id, callback) {
@@ -146,9 +148,7 @@ exports.findDocByID = function (id, callback) {
         callback(doc);
         return doc;
     });
-};
-
-
+ };
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
@@ -191,7 +191,7 @@ exports.delComment = function (writerId, commentId, callback) {
             if(err) console.log(err);
             console.log('comment is deleted');
             callback();
-        })
+        });
 };
 
 ////////////////////////////////////////////////////////////

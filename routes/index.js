@@ -24,8 +24,11 @@ var customMongoose = require('./mongoose');
 
 //router.use('/gridFs', gridFs);
 
-var upload = multer({des: "./uploads"});
-conn.once('open', function () {
+var upload = multer({
+    des: "./uploads"
+});
+conn.once('open', function() {
+
 
   //customMongoose.signUpTest('tjdudwlsdl', '1234');
 });
@@ -33,16 +36,27 @@ conn.once('open', function () {
 /* GET home page. */
 router.get('/', function(req, res, next) {
 
-  // 이미지를 저장할 때
-  // 1. db에 저장
-  //gridFs.imgProcess('http://cfile25.uf.tistory.com/image/244B354651DF67ED33F603', 'final2.jpg', gfs);
-  //res.send('TEST');
+});
 
-  //2. db에 있는 것을 불러온다.
 
-  // gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-  // res.render('index', {title: 'gridFs', img: img})
-  //})
+//레시피 입력 페이지에서 서브밋 하면 여기로 온다
+//재료 입력 추가
+router.post('/recipe-inserted', function(req, res, next){
+  var userId = req.body.userId;
+  var recipeName = req.body.recipeName;
+  var recipe = req.body.recipe;
+  var imageURL = req.body.image;
+  var materals = req.body.materials;
+  var mAry = materals.split(',');
+
+  console.log('material array: '+mAry);
+
+  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
+    console.log('uploadRecipe check');
+    res.redirect('/recipe/'+id);
+    //res.render('detailrecipe', {});
+    //res.send('well done id: ' +id);
+  });
 });
 
 //레시피 입력 페이지
@@ -50,25 +64,6 @@ router.get('/recipe-insert', function(req, res, next){
   res.render('createrecipe', {userId: 'sample'});
 });
 
-//레시피 입력 페이지에서 서브밋 하면 여기로 온다
-router.post('/recipe-inserted', function(req, res, next){
-  var userId = req.body.userId;
-  var recipeName = req.body.recipeName;
-  var recipe = req.body.recipe;
-  var imageURL = req.body.image;
-  var materals = req.body.materials;
-
-  var mAry = materals.split(',');
-  console.log('material array: '+mAry);
-
-
-  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
-    console.log('uploadRecipe check');
-    res.redirect('/recipe/'+id);
-    //res.render('detailrecipe', {});
-    //res.send('well done id: ' +id);
-  })
-});
 
 //이미지 소스 변환 필요
 //
@@ -90,7 +85,7 @@ router.get('/recipe/:id', function (req, res, next) {
       console.log('split test '+str[0]);
       console.log('split test '+str[1]);
       res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
-    })
+    });
   });
 });
 
@@ -107,7 +102,7 @@ router.post('/comment', function (req, res, next) {
 
   customMongoose.addComment(recipeId, writerId, content, function () {
     res.redirect('/recipe/'+recipeId);
-  })
+  });
 
 });
 
@@ -123,15 +118,15 @@ router.post('/delete-comment/:id', function(req, res, next){
 
   customMongoose.delComment(currentId, commentId, function () {
     res.redirect('/recipe/'+recipeId);
-  })
+  });
 });
 
 router.post('/recommend', function (req, res, next) {
   var recipeId = req.body.recipeId;
 
   customMongoose.addRecommend(recipeId, 'tjdudwlsdl', function () {
-    redirect()
-  })
+    redirect();
+  });
 });
 
 
@@ -153,5 +148,96 @@ router.get('/recipe-detail', function (req, res, next) {
     commentDate: commentDate, comment: comment});
 });
 
+/*get test -> to be in main*/
+router.get('/test', function(req, res) {
+    console.log(req.session);
+    if (req.session.logined) { //has logined
+        res.render('main', {
+            userName: req.session.userId
+        });
+    } else {
+        res.render('main', {
+            userName: ''
+        });
+    }
+});
+
+router.post('/checkDUP', function(req, res) {
+    var id = req.body.id;
+    customMongoose.checkDuplicatedID(id, function(users) {
+        res.writeHead(200, {
+            'Content-Type': 'text/plain'
+        });
+        if (users.length > 0) {
+            res.end('DUP');
+        } else {
+            res.end('VALID');
+        }
+    });
+});
+
+router.get('/signUp', function(req, res) {
+    if (req.session.logined) { //has logined
+        res.render('join', {
+            userName: req.session.userId
+        });
+    } else {
+        res.render('join', {
+            userName: ''
+        });
+    }
+});
+router.post('/signUp', function(req, res) {
+    var id = req.body.id;
+    var pw = req.body.password;
+    var materials = req.body.materials;
+    /*re valied check*/
+    if (/\W/.test(id) || id.length > 12 || id.length < 4) {
+        res.send('invalid id');
+    } else if (!/\W/.test(pw) || !/\w/.test(pw) || pw.length > 20 || pw.length < 6) {
+        res.send('invalid password');
+    } else {
+        customMongoose.signUpUser(id, pw, materials, function(err) {
+            if (err) {
+                res.writeHead(500, {
+                    'Content-Type': 'text/plain'
+                });
+                res.end('ERROR');
+            } else {
+                console.log('new user registered');
+                res.writeHead(200, {
+                    'Content-Type': 'text/plain'
+                });
+                res.end('SUCCESS');
+            }
+        });
+    }
+});
+/*log in by jodongmin*/
+router.post('/login', function(req, res) {
+    var id = req.body.id;
+    var pw = req.body.password;
+    console.log('----------------------login-------------------------');
+    customMongoose.login(id, pw, function(user) {
+      console.log(id+"   "+pw+'    '+ user);
+        if (user.length > 0) {
+            /*login success, set session*/
+            req.session.regenerate(function() {
+                req.session.logined = true;
+                req.session.userId = user[0].userId;
+                res.redirect('/test');
+            });
+        } else {
+            res.redirect('/loginFail');
+        }
+    });
+});
+
+/*log out by jodongmin*/
+router.post('/logout', function(req, res) {
+    req.session.destroy(function(err) {
+        if (err) console.error('err', err);
+        res.redirect('/test');
+    });
 
 module.exports = router;
