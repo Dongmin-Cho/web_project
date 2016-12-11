@@ -51,6 +51,7 @@ exports.signUpUser = function(id, pw, mat, callback) {
         console.log("ERROR in save user's info");
       }
       else {
+        console.log(id+pw+mat);
       callback(err);
       }
     });//end save
@@ -72,10 +73,8 @@ exports.checkDuplicatedID = function(id,callback) {
 //사용자 정보 메뉴에서 탈퇴 메뉴를 보여준다.
 //탈퇴 시도시 비번을 한번 더 물어본다
 //
-exports.leaveUser = function(id, pw){
-
-
-
+exports.leaveUser = function(id, pw, callback){
+    Users.find({'userId':id, 'password':pw}).remove(callback());
 };
 
 /////////////////////////////////////////////////사용자 탈퇴
@@ -110,8 +109,14 @@ exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callbac
 
     var recipeID;
 
+    var material_array = materials;
+
+    var count = material_array.length;
+
+    console.log(material_array[0]);
+
     var newrecipe = new Recipes({
-        'userId': id, 'recipeName': name, 'recipe': recipe});
+        'userId': id, 'recipeName': name, 'recipe': recipe, 'material': material_array});
     newrecipe.save(function (err, recipeObject) {
         if(err) console.log('recipe update error');
         console.log('recipe upload done');
@@ -127,11 +132,22 @@ exports.uploadRecipe = function(id, name, recipe, materials, image, gfs, callbac
                     console.log('push recipe done');
                     console.log('recipe id: '+recipeID);
                     callback(recipeID);
-                });
-            });
-        });
+                })
+            })
+        })
     });
 };
+
+////////////////////////////////////////////////////////////
+//////////////////Recipes 컬렉션 문서의 objectid로 문서 객체 반환
+exports.findDocByID = function (id, callback) {
+    Recipes.findOne({_id: id}, function(err, doc){
+        if(err) console.log(err);
+        console.log('find doc process: '+doc.id);
+        callback(doc);
+        return doc;
+    });
+ };
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정

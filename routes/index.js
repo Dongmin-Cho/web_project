@@ -123,6 +123,7 @@ router.post('/login', function(req, res) {
     var pw = req.body.password;
     console.log('----------------------login-------------------------');
     customMongoose.login(id, pw, function(user) {
+      console.log(id+"   "+pw+'    '+ user);
         if (user.length > 0) {
             /*login success, set session*/
             req.session.regenerate(function() {
@@ -154,17 +155,22 @@ router.get('/recipe-insert', function(req, res, next) {
 
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
 //재료 입력 추가
-router.post('/recipe-inserted', function(req, res, next) {
-    var userId = req.body.userId;
-    var recipeName = req.body.recipeName;
-    var recipe = req.body.recipe;
-    var imageURL = req.body.image;
-    var materals = req.body.materials;
-    
-  gridFs.ReturnImageSource('final2.jpg', gfs, function (img) {
-    res.render('index', {title: 'gridFs', img: img});
-  });
+router.post('/recipe-inserted', function(req, res, next){
+  var userId = req.body.userId;
+  var recipeName = req.body.recipeName;
+  var recipe = req.body.recipe;
+  var imageURL = req.body.image;
+  var materals = req.body.materials;
+  var mAry = materals.split(',');
+  console.log('======================='+mAry);
 
+
+  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
+
+    res.redirect('/recipe/'+id);
+    //res.render('detailrecipe', {});
+    //res.send('well done id: ' +id);
+  });
 });
 
 //레시피 입력 페이지
@@ -172,24 +178,6 @@ router.get('/recipe-insert', function(req, res, next){
   res.render('createrecipe', {userId: 'sample'});
 });
 
-//레시피 입력 페이지에서 서브밋 하면 여기로 온다
-router.post('/recipe-inserted', function(req, res, next){
-  var userId = req.body.userId;
-  var recipeName = req.body.recipeName;
-  var recipe = req.body.recipe;
-  var imageURL = req.body.image;
-  var materals = req.body.materials;
-
-    var mAry = materals.split(',');
-
-
-    customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function(id) {
-
-        res.redirect('/recipe/' + id);
-        //res.render('detailrecipe', {});
-        //res.send('well done id: ' +id);
-    });
-});
 
 //이미지 소스 변환 필요
 //
@@ -207,7 +195,7 @@ router.get('/recipe/:id', function (req, res, next) {
      recipe: recipe.recipe, comment: recipe.comment});*/
     gridFs.ReturnImageSource(recipeDoc.id, gfs, function (img) {
       var str = recipeDoc.recipe.split('\r\n');
-
+      console.log(recipeDoc);
       res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
     });
   });
