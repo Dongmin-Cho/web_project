@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 ObjectID = require('mongodb').ObjectID;
-
+var textSearch = require('mongoose-text-search');
 var gridFs = require('./gridFs');
 
 //사용자 스키마
@@ -35,6 +35,13 @@ var RecipeSchema = mongoose.Schema({
         writeDate : {type: Date, default: Date.now}}],
     image : {type: String, default: defaultImage} // 이미지의 파일 이름(레시피 이름으로 저장)
 });
+RecipeSchema.plugin(textSearch);
+
+RecipeSchema.index({
+  material:'text',
+  recipeName:'text'
+});
+
 var Recipes = mongoose.model('Recipes', RecipeSchema);
 
 ////////////////////////////////////////////////////////////
@@ -162,6 +169,13 @@ exports.findALL = function(callback){
     });
 };
 
+exports.searchRecipes = function(param,callback){
+  Recipes.find({$or:[{recipeName:new RegExp('[\w]*'+param+'[\w]*')}, {userId:new RegExp('[\w]*'+param+'[\w]*')}]},function(err,out){
+      if(err) console.log(err);
+
+      callback(out);
+  });
+};
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
 //이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?

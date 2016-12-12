@@ -71,11 +71,14 @@ router.get('/search',function(req,res){
   }else {
     userName = "";
   }
-  console.log('nothing');
-  if(!req.parmas){
-    customMongoose.findALL(function(recipes){
-      res.render('list',{userName:userName,recipes:recipes});
+  if(req.param('searchQuery') !==''){
+    console.log(req.param('searchQuery'));
+    customMongoose.searchRecipes(req.param('searchQuery'),function(output){
+      res.render('list',{userName:userName, recipes:output});
     });
+  }
+  else {
+    res.redirect('/');
   }
 });
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
