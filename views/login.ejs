@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> Create Recipe </title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="style.css" type="text/css"> -->
+</head>
+
+<body class='login-body'>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+                <a class="navbar-brand" href="#">자취생의 레시피</a>
+            </div>
+            <!--/.navbar-collapse -->
+        </div>
+    </nav>
+
+    <div class='login-div'>
+        <% if (message != undefined) { %>
+            <p style="color:red">
+                <%- message %>
+            </p>
+            <% } %>
+            <form action='/login' method='post'>
+              <div class="form-group">
+                <input id='id' type="text" name='id' placeholder="Id" class="form-control login-info">
+              </div>
+              <div class="form-group">
+                <input id='pw' type="password" name='password' placeholder="Password" class="form-control login-info">
+              </div>
+              <button id='btn-login' class="btn btn-success">Sign in</button>
+              <button type='button' class='btn btn-success' onclick="location.href='/signUp'">Sign Up</button>
+              <!--fill the  on click-->
+            </form>
+    </div>
+</body>
+
+</html>

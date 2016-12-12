@@ -34,8 +34,17 @@ conn.once('open', function() {
 });
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-
+router.get('/', function(req, res) {
+    console.log(req.session);
+    if (req.session.logined) { //has logined
+        res.render('main', {
+            userName: req.session.userId
+        });
+    } else {
+        res.render('main', {
+            userName: ''
+        });
+    }
 });
 
 
@@ -61,6 +70,7 @@ router.post('/recipe-inserted', function(req, res, next){
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
+
   res.render('createrecipe', {userId: 'sample'});
 });
 
@@ -121,14 +131,34 @@ router.post('/delete-comment/:id', function(req, res, next){
   });
 });
 
-router.post('/recommend', function (req, res, next) {
-  var recipeId = req.body.recipeId;
+router.post('/recommend', function(req, res, next) {
+    var recipeId = req.body.recipeId;
 
-  customMongoose.addRecommend(recipeId, 'tjdudwlsdl', function () {
-    redirect();
-  });
+    customMongoose.addRecommend(req.body.id, recipeId, function(recipe) {
+        var isthere = recipe.recommendList.find(function(doc) {
+            return doc=== req.body.id;
+        });
+
+        if (isthere !== undefined) {
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end('FAILED');
+        } else {
+            var num = recipe.recommend;
+            recipe.recommend += 1;
+            recipe.recommendList.push(req.body.id);
+            recipe.save(function(err){
+              console.log(err);
+            });
+            res.writeHead(200, {
+                'Content-Type': 'text/plain'
+            });
+            res.end(""+recipe.recommend);
+        }
+    });
+
 });
-
 
 
 router.get('/recipe-detail', function (req, res, next) {
@@ -148,19 +178,6 @@ router.get('/recipe-detail', function (req, res, next) {
     commentDate: commentDate, comment: comment});
 });
 
-/*get test -> to be in main*/
-router.get('/test', function(req, res) {
-    console.log(req.session);
-    if (req.session.logined) { //has logined
-        res.render('main', {
-            userName: req.session.userId
-        });
-    } else {
-        res.render('main', {
-            userName: ''
-        });
-    }
-});
 
 router.post('/checkDUP', function(req, res) {
     var id = req.body.id;
@@ -225,10 +242,12 @@ router.post('/login', function(req, res) {
             req.session.regenerate(function() {
                 req.session.logined = true;
                 req.session.userId = user[0].userId;
-                res.redirect('/test');
+                res.redirect('/');
             });
         } else {
-            res.redirect('/loginFail');
+            res.render('login',{message :'ID 또는 비밀번호를 다시 확인하세요.<br>'+
+              '등록되지 않은 아이디이거나,<br>'+
+              'ID 또는 비밀번호를 잘못 입력하셨습니다.'});
         }
     });
 });
@@ -237,7 +256,8 @@ router.post('/login', function(req, res) {
 router.post('/logout', function(req, res) {
     req.session.destroy(function(err) {
         if (err) console.error('err', err);
-        res.redirect('/test');
+        res.redirect('/');
     });
+});
 
 module.exports = router;

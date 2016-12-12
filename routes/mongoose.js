@@ -28,7 +28,7 @@ var RecipeSchema = mongoose.Schema({
     material : [String],        //재료
     recipe : String,            //조리법
     recommend : {type: Number, default: 0},         //추천수
-    recommendList : [String],   //추천인 목록(중복 추천 방지에만 사용)
+    recommendList : [{type:String}],   //추천인 목록(중복 추천 방지에만 사용)
     comment : [{writerId: String,     //댓글(작성자 id, 댓글 내용, 작성일)
         content : String,
         writeDate : {type: Date, default: Date.now}}],
@@ -204,9 +204,10 @@ exports.addRecommend = function(userId, recipeId, callback){
     //추천하면 사용자 스키마의 추천글 리스트에 해당 레시피 오브젝트 아이디를 추가해준다
 
     //Recipes.update({_id: recipeId, recommendList:{$ne:userId}}, {})
-
-    Recipes.update({_id: recipeId}, {$inc: {recommend: 1}}, function () {
-        callback();
+    Recipes.findOne({image: recipeId},function (err,recipe) {
+      if(err){console.log('ERROR in recommend');}
+      console.log(recipe);
+        callback(recipe);
     });
 
 };
