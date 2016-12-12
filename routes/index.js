@@ -35,16 +35,13 @@ conn.once('open', function() {
 
 /* GET home page. */
 router.get('/', function(req, res) {
-    console.log(req.session);
+    var userName;
     if (req.session.logined) { //has logined
-        res.render('main', {
-            userName: req.session.userId
-        });
+        userName = req.session.userId;
     } else {
-        res.render('main', {
-            userName: ''
-        });
+        userName = "";
     }
+    res.render('main',{userName:userName});
 });
 
 
@@ -70,20 +67,28 @@ router.post('/recipe-inserted', function(req, res, next){
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
+  var userName;
+  if (req.session.logined) { //has logined
+      userName = req.session.userId;
+  } else {
+      userName = "";
+  }
 
-  res.render('createrecipe', {userId: 'sample'});
+  res.render('createrecipe', {userName: userName});
 });
 
 
 //이미지 소스 변환 필요
-//
-//
-//
-//
 router.get('/recipe/:id', function (req, res, next) {
   //res.send('this is '+req.params.id);
   var recipeId = req.params.id;
   console.log('param id: '+recipeId);
+  var userName;
+  if (req.session.logined) { //has logined
+      userName = req.session.userId;
+  } else {
+      userName = "";
+  }
 
   var doc = customMongoose.findDocByID(recipeId, function(recipeDoc) {
     /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
@@ -94,25 +99,25 @@ router.get('/recipe/:id', function (req, res, next) {
       var str = recipeDoc.recipe.split('\r\n');
       console.log('split test '+str[0]);
       console.log('split test '+str[1]);
-      res.render('detailrecipe', {doc: recipeDoc, img: img, recipeStr:str});
+      res.render('detailrecipe', {userName:userName, doc: recipeDoc, img: img, recipeStr:str});
     });
   });
 });
 
 //리콰이어 보낸 레시피에 댓글 추가하기
-router.post('/comment', function (req, res, next) {
-
+router.post('/comment', function(req, res, next) {
 
   var recipeId = req.body.recipeId;
+    if (req.session.logined === true) {
+        var writerId = req.session.userId;
+        var content = req.body.content;
 
-  //var writerId = req.session.userId
-  var writerId = 'tjdudwlsdl';
-
-  var content = req.body.content;
-
-  customMongoose.addComment(recipeId, writerId, content, function () {
-    res.redirect('/recipe/'+recipeId);
-  });
+        customMongoose.addComment(recipeId, writerId, content, function() {
+            res.redirect('/recipe/' + recipeId);
+        });
+    }else {
+      res.render('login',{message:'로그인이 필요합니다.'});
+    }
 
 });
 
@@ -161,22 +166,22 @@ router.post('/recommend', function(req, res, next) {
 });
 
 
-router.get('/recipe-detail', function (req, res, next) {
-  var name = '엄청맛있는거';
-  var id = 'tjdudwlsdl';
-  var date = 'now';
-  var url = 'http://cfile9.uf.tistory.com/image/227A6E3553A823C724F802';
-  var recommend = 77;
-  var material = '이거랑, 저거랑, 이것도';
-  var recipe = '이러저러하게 만들자';
-  var commentID = 'tjdudwlsdl';
-  var commentDate = 'now';
-  var comment = '블라블라블라';
-
-  res.render('detailrecipe', {recipeName: name, id: id, date: date, url: url,
-    recommend: recommend, material: material, recipe: recipe, commentID: commentID,
-    commentDate: commentDate, comment: comment});
-});
+// router.get('/recipe-detail', function (req, res, next) {
+//   var name = '엄청맛있는거';
+//   var id = 'tjdudwlsdl';
+//   var date = 'now';
+//   var url = 'http://cfile9.uf.tistory.com/image/227A6E3553A823C724F802';
+//   var recommend = 77;
+//   var material = '이거랑, 저거랑, 이것도';
+//   var recipe = '이러저러하게 만들자';
+//   var commentID = 'tjdudwlsdl';
+//   var commentDate = 'now';
+//   var comment = '블라블라블라';
+//
+//   res.render('detailrecipe', {recipeName: name, id: id, date: date, url: url,
+//     recommend: recommend, material: material, recipe: recipe, commentID: commentID,
+//     commentDate: commentDate, comment: comment});
+// });
 
 
 router.post('/checkDUP', function(req, res) {
@@ -194,15 +199,9 @@ router.post('/checkDUP', function(req, res) {
 });
 
 router.get('/signUp', function(req, res) {
-    if (req.session.logined) { //has logined
-        res.render('join', {
-            userName: req.session.userId
-        });
-    } else {
         res.render('join', {
             userName: ''
         });
-    }
 });
 router.post('/signUp', function(req, res) {
     var id = req.body.id;
@@ -234,9 +233,7 @@ router.post('/signUp', function(req, res) {
 router.post('/login', function(req, res) {
     var id = req.body.id;
     var pw = req.body.password;
-    console.log('----------------------login-------------------------');
     customMongoose.login(id, pw, function(user) {
-      console.log(id+"   "+pw+'    '+ user);
         if (user.length > 0) {
             /*login success, set session*/
             req.session.regenerate(function() {

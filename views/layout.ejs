@@ -42,9 +42,9 @@
 					<!-- /login -->
 					<% } else {%>
 						<!-- logout -->
-						<form class="navbar-form navbar-right" role="form" action='logout' method='post'>
+						<form class="navbar-form navbar-right" role="form" action='/logout' method='post'>
 							<div class="user-info">
-								<%= userName %>님 환영합니다
+								<span id='user-id' value='<%= userName %>'><%= userName %>님 환영합니다</span>
 								<button type="submit" class="btn btn-success">Sign out</button>
 							</div>
 
@@ -58,7 +58,7 @@
 	</nav>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-	<script src="js/client.js"></script>
+	<script src="/js/client.js"></script>
 </body>
 
 </html>

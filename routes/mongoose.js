@@ -175,7 +175,7 @@ exports.deleteRecipe = function (userid, _id) {
 //content: 댓글 내용
 //584d6731d5d267200c8a7477
 exports.addComment = function(recipeId, writerId, content, callback){
-    Recipes.update({_id: recipeId}, {$push: {comment: {writerId: writerId, content: content}}},
+    Recipes.update({_id: recipeId}, {$push: {'comment': {'writerId': writerId, 'content': content}}},
         function () {
             callback();
         });
