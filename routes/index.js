@@ -41,16 +41,6 @@ router.get('/', function(req, res) {
     } else {
         userName = "";
     }
-    customMongoose.findALL(function(recipe){
-      var imgarr = [];
-      gridFs.Return3Image(recipe[0].id,recipe[1].id,recipe[2].id, gfs, function(img){
-        imgarr.push(img);
-        console.log('top1:  '+ recipe[0].id+'  top2  :'+recipe[1].id+  '   top3  :'+recipe[2].id+ '   arr: '+imgarr);
-        res.render('main',{userName:userName ,top1:recipe[0], top2:recipe[1], top3:recipe[2], img:imgarr});
-      });
-
-    });
-
 });
 
 
@@ -86,6 +76,13 @@ router.get('/recipe-insert', function(req, res, next){
   res.render('createrecipe', {userName: userName});
 });
 
+router.post('/delete-recipe/:id', function (req, res) {
+  var recipeId = req.dody.id;
+  var userId = req.body.userId;
+  customMongoose.deleteRecipe(userId,recipeId,function(){
+    res.redirect('/');
+  });
+});
 
 //이미지 소스 변환 필요
 router.get('/recipe/:id', function (req, res, next) {

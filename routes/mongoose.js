@@ -169,9 +169,8 @@ exports.updateRecipe = function(id, name, recipe, image){
 //삭제 권한 : 관리자 혹은 작성자 본인
 //애초에 삭제 버튼을 관리자나 작성자에게만 보여주거나
 //삭제시 체크하는 것이 필요
-exports.deleteRecipe = function (userid, _id) {
-
-
+exports.deleteRecipe = function (userid, _id,callback) {
+  Recipes.find({userId:userid, _id:ObjectID(_id)}).remove().exec(callback());
 };
 
 ////////////////////////////////////////////////////////////
