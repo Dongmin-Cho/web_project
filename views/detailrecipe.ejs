@@ -40,19 +40,17 @@
     <div class="row">
         <div class="col-xs-4 " style="margin-left: 15px;">
             <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
-            <div style="margin-top: 80px; font-size: 27px;">작성자 : <i><%=doc.userId%>  </i> </div>
-            <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date%></i> </div>
+            <div style="margin-top: 80px; font-size: 27px;">작성자 : <i id='recipe-user-id'><%=doc.userId%>  </i> </div>
+            <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date.toDateString() %></i> </div>
         </div>
 
         <div class="col-xs-2" style="margin-top:80px ">
-            <form method="post", action="/recommend">
                 <p>
-                    <input type="hidden" name="recipeId" value="<%=doc.id%>">
-                    <input type="submit" class="btn btn-primary btn-lg" value="추천!">
+                    <input id='recipeId' type="hidden" name="recipeId" value="<%=doc.id%>"></p>
+                    <button id='btn-recommend' type="button" class="btn btn-primary btn-lg">추천!</button>
                 </p>
-            </form>
             <div class="row" style="margin-top:100px">
-                <p>추 천 수 : <%=doc.recommend%> </p>
+                <sapn>추 천 수 : </span><span id='recommend-num'><%=doc.recommend%> </span>
             </div>
         </div>
         <div class="col-xs-5">
@@ -138,6 +136,7 @@
 <!-- /container -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script src="/js/client.js"></script>
 </body>
 
 

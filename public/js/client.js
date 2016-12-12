@@ -35,6 +35,28 @@ $(document).ready(function() { //id 입력란 변경시 유효성 체크
     });
 });
 
+$(document).ready(function() { //id 입력란 변경시 유효성 체크
+    $("#btn-recommend").click(function() {
+            $.ajax({
+                url: '/recommend',
+                type: 'POST',
+                data: {
+                    'id': $('#recipe-user-id').html(),
+                    'recipeId': $('#recipeId').val()
+                },
+                dataType: 'html',
+                success: function(data) {
+                  console.log(data);
+                        if (data === 'FAILED') {
+                          alert('이미 추천하셨습니다.');
+                        } else {
+                            $('#recommend-num').html('<b style="font-style: normal;">'+data+'<b>');
+                        }
+                    } //end success function
+            });
+    });
+});
+
 /*add evnet listener when enter key is up*/
 //by jodongmin
 $(".login-info").keyup(function(event) {
