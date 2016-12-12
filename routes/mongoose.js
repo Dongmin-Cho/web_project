@@ -150,6 +150,13 @@ exports.findDocByID = function (id, callback) {
     });
  };
 
+exports.findALL = function(callback){
+  Recipes.find({}).sort({'recommend':-1}).exec(function(err, doc){
+      if(err) console.log(err);
+      callback(doc);
+  });
+};
+
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
 //이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?

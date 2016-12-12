@@ -101,8 +101,8 @@ function signUp() {
 }
 /*when log in, check it is valid*/
 //by jodongmin
-$(document).ready(function() { //DOM이 준비되고
-    $('#btn-login').submit(function() { //문서의 모든 form이 submit될때
+$(document).ready(function() {
+    $('#btn-login').submit(function() {
         if ($('#id').val() === "") {
             alert("아이디를 입력해 주세요.");
             $('#id').focus();

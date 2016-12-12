@@ -154,6 +154,64 @@ exports.ReturnImageSource = function (filename, gfs, callback) {
     })
 };
 
+exports.Return3Image = function (id1,id2,id3, gfs, callback) {
+    //write content to file system
+    //////////////////////////////////////////////////////////////
+    gfs.files.find({$or:[{filename:id1},{filename:id2},{filename:id3}]}).toArray(function(err, file) {
+        if (err) console.log(err);
+        console.log(file);
+        var base64 = [];
+        console.log('file found check: '+file[0]);
+        if (file.length > 0) {
+            var readStream1 = gfs.createReadStream({filename: id1});
+            var bufs1 = [];
+            readStream1.on('data', function(chunk){
+                bufs1.push(chunk);
+            }).on('end', function(){
+                var fbuf = Buffer.concat(bufs1);
+                base64.push((fbuf.toString('base64')));
+                console.log('file string will be returned');
+                //console.log(base64);
+            });
+        } else {
+            console.log('file not found error');
+        }
+
+        console.log('file found check: '+file[1]);
+        if (file.length > 0) {
+            var readStream2 = gfs.createReadStream({filename: id2});
+            var bufs2 = [];
+            readStream2.on('data', function(chunk){
+                bufs2.push(chunk);
+            }).on('end', function(){
+                var fbuf = Buffer.concat(bufs2);
+                base64.push((fbuf.toString('base64')));
+                console.log('file string will be returned');
+                //console.log(base64);
+            });
+        } else {
+            console.log('file not found error');
+        }
+        console.log('file found check: '+file[2]);
+        if (file.length > 0) {
+            var readStream3 = gfs.createReadStream({filename: id3});
+            var bufs3 = [];
+            readStream3.on('data', function(chunk){
+                bufs3.push(chunk);
+            }).on('end', function(){
+                var fbuf = Buffer.concat(bufs3);
+                base64.push((fbuf.toString('base64')));
+                console.log('file string will be returned');
+                //console.log(base64);
+            });
+        } else {
+            console.log('file not found error');
+        }
+        console.log(base64);
+        callback(base64);
+    });
+};
+
 
 exports.imgProcess = function(url, filename, gfs, callback){
     myGrid.downloadImageFromUrl(url, filename, function () {

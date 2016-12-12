@@ -41,7 +41,16 @@ router.get('/', function(req, res) {
     } else {
         userName = "";
     }
-    res.render('main',{userName:userName});
+    customMongoose.findALL(function(recipe){
+      var imgarr = [];
+      gridFs.Return3Image(recipe[0].id,recipe[1].id,recipe[2].id, gfs, function(img){
+        imgarr.push(img);
+        console.log('top1:  '+ recipe[0].id+'  top2  :'+recipe[1].id+  '   top3  :'+recipe[2].id+ '   arr: '+imgarr);
+        res.render('main',{userName:userName ,top1:recipe[0], top2:recipe[1], top3:recipe[2], img:imgarr});
+      });
+
+    });
+
 });
 
 
