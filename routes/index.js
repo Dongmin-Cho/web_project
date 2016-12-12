@@ -92,6 +92,8 @@ router.post('/recipe-inserted', function(req, res, next){
     var mAry = materals.split(',');
 
     console.log('material array: '+mAry);
+    console.log('userId: '+userId);
+    console.log('session Id: '+req.session.userId);
 
     customMongoose.uploadRecipe(req.session.userId, recipeName, recipe, mAry, imageURL, gfs, function (id) {
         console.log('uploadRecipe check');
@@ -100,6 +102,8 @@ router.post('/recipe-inserted', function(req, res, next){
         //res.send('well done id: ' +id);
     });
 });
+
+
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
@@ -147,6 +151,7 @@ router.get('/recipe/:id', function (req, res, next) {
     });
 });
 
+
 //리콰이어 보낸 레시피에 댓글 추가하기
 router.post('/comment', function(req, res, next) {
 
@@ -161,17 +166,18 @@ router.post('/comment', function(req, res, next) {
     }else {
         res.render('login',{message:'로그인이 필요합니다.'});
     }
-
 });
 
+
 //해당 댓글 삭제하기
+//구현은 페이지에서
 router.post('/delete-comment/:id', function(req, res, next){
 
     var recipeId = req.params.id;
     console.log(recipeId);
     var commentId = req.body.deleteCommentId;
     console.log(commentId);
-    //var currentId = req.session.userId;
+
     var currentId = req.session.userId;
 
     customMongoose.delComment(currentId, commentId, function () {
@@ -179,6 +185,7 @@ router.post('/delete-comment/:id', function(req, res, next){
     });
 });
 
+//추천추천!
 router.post('/recommend', function(req, res, next) {
     var recipeId = req.body.recipeId;
 
@@ -207,24 +214,6 @@ router.post('/recommend', function(req, res, next) {
     });
 
 });
-
-
-// router.get('/recipe-detail', function (req, res, next) {
-//   var name = '엄청맛있는거';
-//   var id = 'tjdudwlsdl';
-//   var date = 'now';
-//   var url = 'http://cfile9.uf.tistory.com/image/227A6E3553A823C724F802';
-//   var recommend = 77;
-//   var material = '이거랑, 저거랑, 이것도';
-//   var recipe = '이러저러하게 만들자';
-//   var commentID = 'tjdudwlsdl';
-//   var commentDate = 'now';
-//   var comment = '블라블라블라';
-//
-//   res.render('detailrecipe', {recipeName: name, id: id, date: date, url: url,
-//     recommend: recommend, material: material, recipe: recipe, commentID: commentID,
-//     commentDate: commentDate, comment: comment});
-// });
 
 
 router.post('/checkDUP', function(req, res) {
@@ -298,6 +287,48 @@ router.post('/logout', function(req, res) {
         if (err) console.error('err', err);
         res.redirect('/');
     });
+});
+
+
+router.post('/modify-recipe', function (req, res, next) {
+    var recipeId = req.body.delRecipeId;
+
+    customMongoose.findDocByID(recipeId, function(doc){
+        if(doc.userId==req.session.userId || req.session.userId=='admin') {
+            var str = doc.recipe.split('\r\n');
+            console.log('modify str: '+str[0]);
+            res.render('modify_recipe', {doc: doc, userName: req.session.userId, recipe: str});
+        }
+        else
+            res.redirect('/');
+    });
+});
+
+router.post('/recipe-modified', function (req, res, next) {
+
+    //var userId = req.body.userId;
+    var recipeId = req.body.modified_id;
+    var recipeName = req.body.recipeName;
+    var recipe = req.body.recipe;
+    var imageURL = req.body.image;
+    var materals = req.body.materials;
+    var mAry = materals.split(',');
+
+    console.log('material array: '+mAry);
+    //console.log('userId: '+userId);
+    console.log('session Id: '+req.session.userId);
+
+    var str = recipe.split('\r\n');
+
+    console.log('modify str: '+str[0]);
+
+    customMongoose.updateRecipe(recipeId, recipeName, str, mAry, imageURL, gfs, function (id) {
+        console.log('uploadRecipe check');
+        res.redirect('/recipe/'+id);
+        //res.render('detailrecipe', {});
+        //res.send('well done id: ' +id);
+    });
+
 });
 
 module.exports = router;
