@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
+ObjectID = require('mongodb').ObjectID;
 
 var gridFs = require('./gridFs');
 
@@ -151,7 +152,7 @@ exports.findDocByID = function (id, callback) {
 };
 
 exports.findALL = function(callback){
-    var top3Ary= new Array;
+    var top3Ary= new Array([]);
     Recipes.find({}).sort({'recommend':-1}).exec(function(err, doc){
         if(err) console.log(err);
         top3Ary[0]=doc[0];

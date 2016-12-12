@@ -64,7 +64,20 @@ router.get('/', function(req, res) {
     });
 });
 
-
+router.get('/search',function(req,res){
+  var userName;
+  if(req.session.logined){
+    userName = req.session.userId;
+  }else {
+    userName = "";
+  }
+  console.log('nothing');
+  if(!req.parmas){
+    customMongoose.findALL(function(recipes){
+      res.render('list',{userName:userName,recipes:recipes});
+    });
+  }
+});
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
 //재료 입력 추가
 router.post('/recipe-inserted', function(req, res, next){
@@ -98,7 +111,7 @@ router.get('/recipe-insert', function(req, res, next){
 });
 
 router.post('/delete-recipe/:id', function (req, res) {
-  var recipeId = req.dody.id;
+  var recipeId = req.body.id;
   var userId = req.body.userId;
   customMongoose.deleteRecipe(userId,recipeId,function(){
     res.redirect('/');
