@@ -34,7 +34,6 @@ var upload = multer({
  //customMongoose.signUpTest('tjdudwlsdl', '1234');
  });
  */
-
 /* GET home page. */
 router.get('/', function(req, res) {
     var userName;
@@ -45,32 +44,43 @@ router.get('/', function(req, res) {
         userName = "";
     }
 
-    customMongoose.findALL(function(recipe){
-        console.log("1st recipe: "+recipe[0].id);
+    customMongoose.findALL(function(recipe) {
+        console.log("1st recipe: " + recipe[0].id);
         gridFs.ReturnImageSource(recipe[0].id, gfs, function(img1) {
             gridFs.ReturnImageSource(recipe[1].id, gfs, function(img2) {
                 gridFs.ReturnImageSource(recipe[2].id, gfs, function(img3) {
-                    res.render('main',{userName:userName ,top1:recipe[0], top2:recipe[1], top3:recipe[2],
-                        img1: img1, img2: img2, img3: img3});
-                })
-            })
+                    res.render('main', {
+                        userName: userName,
+                        top1: recipe[0],
+                        top2: recipe[1],
+                        top3: recipe[2],
+                        img1: img1,
+                        img2: img2,
+                        img3: img3
+                    });
+                });
+            });
         });
-
-
-
-
-//      gridFs.Return3Image(recipe[0].id,recipe[1].id,recipe[2].id, gfs, function(img){
-        //      imgarr.push(img);
-        //    console.log('top1:  '+ recipe[0].id+'  top2  :'+recipe[1].id+  '   top3  :'+recipe[2].id+ '   arr: '+imgarr);
-        //  res.render('main',{userName:userName ,top1:recipe[0], top2:recipe[1], top3:recipe[2], img:imgarr});
-        //});
-
-
     });
-
 });
 
-
+router.get('/search',function(req,res){
+  var userName;
+  if(req.session.logined){
+    userName = req.session.userId;
+  }else {
+    userName = "";
+  }
+  if(req.param('searchQuery') !==''){
+    console.log(req.param('searchQuery'));
+    customMongoose.searchRecipes(req.param('searchQuery'),function(output){
+      res.render('list',{userName:userName, recipes:output});
+    });
+  }
+  else {
+    res.redirect('/');
+  }
+});
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
 //재료 입력 추가
 router.post('/recipe-inserted', function(req, res, next){
@@ -83,7 +93,7 @@ router.post('/recipe-inserted', function(req, res, next){
 
     console.log('material array: '+mAry);
 
-    customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
+    customMongoose.uploadRecipe(req.session.userId, recipeName, recipe, mAry, imageURL, gfs, function (id) {
         console.log('uploadRecipe check');
         res.redirect('/recipe/'+id);
         //res.render('detailrecipe', {});
@@ -103,6 +113,13 @@ router.get('/recipe-insert', function(req, res, next){
     res.render('createrecipe', {userName: userName});
 });
 
+router.post('/delete-recipe/:id', function (req, res) {
+  var recipeId = req.body.id;
+  var userId = req.body.userId;
+  customMongoose.deleteRecipe(userId,recipeId,function(){
+    res.redirect('/');
+  });
+});
 
 //이미지 소스 변환 필요
 router.get('/recipe/:id', function (req, res, next) {
@@ -155,7 +172,7 @@ router.post('/delete-comment/:id', function(req, res, next){
     var commentId = req.body.deleteCommentId;
     console.log(commentId);
     //var currentId = req.session.userId;
-    var currentId = 'tjdudwlsdl';
+    var currentId = req.session.userId;
 
     customMongoose.delComment(currentId, commentId, function () {
         res.redirect('/recipe/'+recipeId);
