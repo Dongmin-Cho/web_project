@@ -48,24 +48,24 @@ exports.signUpUser = function(id, pw, mat, callback) {
         'materials':mat
     });
     user.save(function(err) {
-      if(err){
-        console.log("ERROR in save user's info");
-      }
-      else {
-        console.log(id+pw+mat);
-      callback(err);
-      }
+        if(err){
+            console.log("ERROR in save user's info");
+        }
+        else {
+            console.log(id+pw+mat);
+            callback(err);
+        }
     });//end save
 };
 //check duplicated by jodongmin
 exports.checkDuplicatedID = function(id,callback) {
     Users.find({'userId':id},function(err,users){
-      if(err){
-        console.log('ERROR in check duplicated');
-      }else{
-        callback(users);
-      }
-  });
+        if(err){
+            console.log('ERROR in check duplicated');
+        }else{
+            callback(users);
+        }
+    });
 };
 
 
@@ -83,16 +83,16 @@ exports.leaveUser = function(id, pw, callback){
 //by jodongmin
 exports.login = function(id,pw,callback){
 
-  Users.find({
-      'userId': id,
-      'password': pw
-  },function(err,user){
-    if(err){
-      console.log('ERROR in login');
-    }else {
-      callback(user);
-    }
-  });
+    Users.find({
+        'userId': id,
+        'password': pw
+    },function(err,user){
+        if(err){
+            console.log('ERROR in login');
+        }else {
+            callback(user);
+        }
+    });
 };
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 등록
@@ -148,13 +148,17 @@ exports.findDocByID = function (id, callback) {
         callback(doc);
         return doc;
     });
- };
+};
 
 exports.findALL = function(callback){
-  Recipes.find({}).sort({'recommend':-1}).exec(function(err, doc){
-      if(err) console.log(err);
-      callback(doc);
-  });
+    var top3Ary= new Array;
+    Recipes.find({}).sort({'recommend':-1}).exec(function(err, doc){
+        if(err) console.log(err);
+        top3Ary[0]=doc[0];
+        top3Ary[1]=doc[1];
+        top3Ary[2]=doc[2];
+        callback(top3Ary);
+    });
 };
 
 ////////////////////////////////////////////////////////////
@@ -211,8 +215,8 @@ exports.addRecommend = function(userId, recipeId, callback){
 
     //Recipes.update({_id: recipeId, recommendList:{$ne:userId}}, {})
     Recipes.findOne({image: recipeId},function (err,recipe) {
-      if(err){console.log('ERROR in recommend');}
-      console.log(recipe);
+        if(err){console.log('ERROR in recommend');}
+        console.log(recipe);
         callback(recipe);
     });
 

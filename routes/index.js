@@ -27,53 +27,74 @@ var customMongoose = require('./mongoose');
 var upload = multer({
     des: "./uploads"
 });
-conn.once('open', function() {
+/*
+ conn.once('open', function() {
 
 
-  //customMongoose.signUpTest('tjdudwlsdl', '1234');
-});
-
+ //customMongoose.signUpTest('tjdudwlsdl', '1234');
+ });
+ */
 /* GET home page. */
 router.get('/', function(req, res) {
     var userName;
+
     if (req.session.logined) { //has logined
         userName = req.session.userId;
     } else {
         userName = "";
     }
+
+    customMongoose.findALL(function(recipe) {
+        console.log("1st recipe: " + recipe[0].id);
+        gridFs.ReturnImageSource(recipe[0].id, gfs, function(img1) {
+            gridFs.ReturnImageSource(recipe[1].id, gfs, function(img2) {
+                gridFs.ReturnImageSource(recipe[2].id, gfs, function(img3) {
+                    res.render('main', {
+                        userName: userName,
+                        top1: recipe[0],
+                        top2: recipe[1],
+                        top3: recipe[2],
+                        img1: img1,
+                        img2: img2,
+                        img3: img3
+                    });
+                });
+            });
+        });
+    });
 });
 
 
 //레시피 입력 페이지에서 서브밋 하면 여기로 온다
 //재료 입력 추가
 router.post('/recipe-inserted', function(req, res, next){
-  var userId = req.body.userId;
-  var recipeName = req.body.recipeName;
-  var recipe = req.body.recipe;
-  var imageURL = req.body.image;
-  var materals = req.body.materials;
-  var mAry = materals.split(',');
+    var userId = req.body.userId;
+    var recipeName = req.body.recipeName;
+    var recipe = req.body.recipe;
+    var imageURL = req.body.image;
+    var materals = req.body.materials;
+    var mAry = materals.split(',');
 
-  console.log('material array: '+mAry);
+    console.log('material array: '+mAry);
 
-  customMongoose.uploadRecipe('tjdudwlsdl', recipeName, recipe, mAry, imageURL, gfs, function (id) {
-    console.log('uploadRecipe check');
-    res.redirect('/recipe/'+id);
-    //res.render('detailrecipe', {});
-    //res.send('well done id: ' +id);
-  });
+    customMongoose.uploadRecipe(req.session.userId, recipeName, recipe, mAry, imageURL, gfs, function (id) {
+        console.log('uploadRecipe check');
+        res.redirect('/recipe/'+id);
+        //res.render('detailrecipe', {});
+        //res.send('well done id: ' +id);
+    });
 });
 
 //레시피 입력 페이지
 router.get('/recipe-insert', function(req, res, next){
-  var userName;
-  if (req.session.logined) { //has logined
-      userName = req.session.userId;
-  } else {
-      userName = "";
-  }
+    var userName;
+    if (req.session.logined) { //has logined
+        userName = req.session.userId;
+    } else {
+        userName = "";
+    }
 
-  res.render('createrecipe', {userName: userName});
+    res.render('createrecipe', {userName: userName});
 });
 
 router.post('/delete-recipe/:id', function (req, res) {
@@ -86,34 +107,34 @@ router.post('/delete-recipe/:id', function (req, res) {
 
 //이미지 소스 변환 필요
 router.get('/recipe/:id', function (req, res, next) {
-  //res.send('this is '+req.params.id);
-  var recipeId = req.params.id;
-  console.log('param id: '+recipeId);
-  var userName;
-  if (req.session.logined) { //has logined
-      userName = req.session.userId;
-  } else {
-      userName = "";
-  }
+    //res.send('this is '+req.params.id);
+    var recipeId = req.params.id;
+    console.log('param id: '+recipeId);
+    var userName;
+    if (req.session.logined) { //has logined
+        userName = req.session.userId;
+    } else {
+        userName = "";
+    }
 
-  var doc = customMongoose.findDocByID(recipeId, function(recipeDoc) {
-    /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
-     url: recipe.image, recommend: recipe.recommend, material: recipe.material,
-     recipe: recipe.recipe, comment: recipe.comment});*/
-    console.log('findbyid check: '+recipeDoc.id);
-    gridFs.ReturnImageSource(recipeDoc.id, gfs, function(img) {
-      var str = recipeDoc.recipe.split('\r\n');
-      console.log('split test '+str[0]);
-      console.log('split test '+str[1]);
-      res.render('detailrecipe', {userName:userName, doc: recipeDoc, img: img, recipeStr:str});
+    var doc = customMongoose.findDocByID(recipeId, function(recipeDoc) {
+        /*res.render('detailrecipe', {recipeName: recipe.recipeName, id: recipe.userId, date: recipe.date,
+         url: recipe.image, recommend: recipe.recommend, material: recipe.material,
+         recipe: recipe.recipe, comment: recipe.comment});*/
+        console.log('findbyid check: '+recipeDoc.id);
+        gridFs.ReturnImageSource(recipeDoc.id, gfs, function(img) {
+            var str = recipeDoc.recipe.split('\r\n');
+            console.log('split test '+str[0]);
+            console.log('split test '+str[1]);
+            res.render('detailrecipe', {userName:userName, doc: recipeDoc, img: img, recipeStr:str});
+        });
     });
-  });
 });
 
 //리콰이어 보낸 레시피에 댓글 추가하기
 router.post('/comment', function(req, res, next) {
 
-  var recipeId = req.body.recipeId;
+    var recipeId = req.body.recipeId;
     if (req.session.logined === true) {
         var writerId = req.session.userId;
         var content = req.body.content;
@@ -122,7 +143,7 @@ router.post('/comment', function(req, res, next) {
             res.redirect('/recipe/' + recipeId);
         });
     }else {
-      res.render('login',{message:'로그인이 필요합니다.'});
+        res.render('login',{message:'로그인이 필요합니다.'});
     }
 
 });
@@ -130,16 +151,16 @@ router.post('/comment', function(req, res, next) {
 //해당 댓글 삭제하기
 router.post('/delete-comment/:id', function(req, res, next){
 
-  var recipeId = req.params.id;
-  console.log(recipeId);
-  var commentId = req.body.deleteCommentId;
-  console.log(commentId);
-  //var currentId = req.session.userId;
-  var currentId = 'tjdudwlsdl';
+    var recipeId = req.params.id;
+    console.log(recipeId);
+    var commentId = req.body.deleteCommentId;
+    console.log(commentId);
+    //var currentId = req.session.userId;
+    var currentId = req.session.userId;
 
-  customMongoose.delComment(currentId, commentId, function () {
-    res.redirect('/recipe/'+recipeId);
-  });
+    customMongoose.delComment(currentId, commentId, function () {
+        res.redirect('/recipe/'+recipeId);
+    });
 });
 
 router.post('/recommend', function(req, res, next) {
@@ -160,7 +181,7 @@ router.post('/recommend', function(req, res, next) {
             recipe.recommend += 1;
             recipe.recommendList.push(req.body.id);
             recipe.save(function(err){
-              console.log(err);
+                console.log(err);
             });
             res.writeHead(200, {
                 'Content-Type': 'text/plain'
@@ -205,9 +226,9 @@ router.post('/checkDUP', function(req, res) {
 });
 
 router.get('/signUp', function(req, res) {
-        res.render('join', {
-            userName: ''
-        });
+    res.render('join', {
+        userName: ''
+    });
 });
 router.post('/signUp', function(req, res) {
     var id = req.body.id;
@@ -249,8 +270,8 @@ router.post('/login', function(req, res) {
             });
         } else {
             res.render('login',{message :'ID 또는 비밀번호를 다시 확인하세요.<br>'+
-              '등록되지 않은 아이디이거나,<br>'+
-              'ID 또는 비밀번호를 잘못 입력하셨습니다.'});
+            '등록되지 않은 아이디이거나,<br>'+
+            'ID 또는 비밀번호를 잘못 입력하셨습니다.'});
         }
     });
 });
