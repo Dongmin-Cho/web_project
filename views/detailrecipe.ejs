@@ -1,143 +1,114 @@
-<!DOCTYPE html>
-<html>
+<%- include layout.ejs %>
+    <html>
 
-<head>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%=doc.recipeName%></title>
+    <body>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/stylesheets/style.css" type="text/css">
-</head>
 
-<body>
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">자취생의 레시피</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <form class="navbar-form navbar-right">
-                <div class="form-group">
-                    <input class="form-control" type="text" placeholder="ID 님 환영합니다." readonly>
-                    <button type="submit" class="btn btn-success"><a href="/userdata" style="color:white">My page</a></button>
+        <div class="container-fluid jumbotron" style="margin-top: 25px">
+            <div class="row">
+                <div class="col-xs-4 " style="margin-left: 15px;">
+                    <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
+                    <div style="margin-top: 80px; font-size: 27px;">작성자 : <i><%=doc.userId%>  </i> </div>
+                    <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date.toDateString() %></i> </div>
                 </div>
-            </form>
-            <!--/.navbar-collapse -->
-        </div>
-    </div>
-</nav>
 
-<div class="container-fluid jumbotron" style="margin-top: 25px">
-    <div class="row">
-        <div class="col-xs-4 " style="margin-left: 15px;">
-            <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
-            <div style="margin-top: 80px; font-size: 27px;">작성자 : <i id='recipe-user-id'><%=doc.userId%>  </i> </div>
-            <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date.toDateString() %></i> </div>
-        </div>
-
-        <div class="col-xs-2" style="margin-top:80px ">
-                <p>
-                    <input id='recipeId' type="hidden" name="recipeId" value="<%=doc.id%>"></p>
+                <div class="col-xs-2" style="margin-top:80px ">
+                    <p>
+                        <input id='recipeId' type="hidden" name="recipeId" value="<%=doc.id%>"></p>
                     <button id='btn-recommend' type="button" class="btn btn-primary btn-lg">추천!</button>
-                </p>
-            <div class="row" style="margin-top:100px">
-                <sapn>추 천 수 : </span><span id='recommend-num'><%=doc.recommend%> </span>
-            </div>
-        </div>
-        <div class="col-xs-5">
-            <a data-toggle="modal" data-target="#myModal" >
+                    </p>
+                    <div class="row" style="margin-top:100px">
+                        <sapn>추 천 수 : </span><span id='recommend-num'><%=doc.recommend%> </span>
+                    </div>
+                </div>
+                <div class="col-xs-5">
+                    <a data-toggle="modal" data-target="#myModal">
                 <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px" >
             </a>
 
-            <!-- 모달 팝업 -->
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px" >
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <!-- 모달 팝업 -->
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+
                 </div>
+
             </div>
-
-
         </div>
 
-    </div>
-</div>
-
-<div>
-    <h2 style="text-align: left;"><strong>재료</strong></h2>
-    <div>
-        <%
+        <div>
+            <h2 style="text-align: left;"><strong>재료</strong></h2>
+            <div>
+                <%
         for(var m=0;m<doc.material.length;m++){
         %>
-        <button class="btn btn-warning btn-sm"><%=doc.material[m]%></button>
-        <%
+                    <button class="btn btn-warning btn-sm"><%=doc.material[m]%></button>
+                    <%
         }
         %>
-    </div>
-    <h2 style="text-align: left;"><strong>조리법</strong></h2>
-    <% for(var s=0; s<recipeStr.length; s++){
-    %>
-    <p style="font-size : 18px;"><%=recipeStr[s]%></p>
-    <%
-    }
-    %>
-</div>
-
-<div>
-    <h2 style="text-align: left;"><strong>댓글</strong></h2>
-
-    <% if(doc.comment.length>0){ %>
-    <% for(var i=0; i<doc.comment.length; i++){ %>
-    <div class="col-md-5 col-md-offset-3">
-        <p style="font-size: 14px;"><strong style="font-size: 22px;"><%=doc.comment[i].writerId%> </strong> <%=doc.comment[i].writeDate%></p>
-    </div>
-    <div class="col-md-12" style="font-size: 17px">
-        <%=doc.comment[i].content%>
-    </div>
-    <form method="post" action="/delete-comment/<%=doc.id%>">
-        <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
-
-        <input type="submit" class = "btn btn-danger btn-sm" value="덧글 지우기">
-    </form>
-    <%
-    }
-    }%>
-    <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
-        <form style="font-size: 18px; margin-bottom: 15px;"   method="post" action="/comment">
-            <div class="col-sm-9">
-                <input type="text" class="form-control" name="content" placeholder="Write your comment">
-                <input type="hidden" name="recipeId" value="<%=doc.id%>">
             </div>
-            <button type="submit" class="btn btn-defalut btn-md" >덧글 달기</button>
-        </form>
-    </div>
-</div>
+            <h2 style="text-align: left;"><strong>조리법</strong></h2>
+            <% for(var s=0; s<recipeStr.length; s++){
+    %>
+                <p style="font-size : 18px;">
+                    <%=recipeStr[s]%>
+                </p>
+                <%
+    }
+    %>
+        </div>
+
+        <div>
+            <h2 style="text-align: left;"><strong>댓글</strong></h2>
+
+            <% if(doc.comment.length>0){ %>
+                <% for(var i=0; i<doc.comment.length; i++){ %>
+                  <div style="width = auto">
+                    <span class="col-md-3 ">
+                      <strong style="font-size: 15px;"><%=doc.comment[i].writerId%> </strong> <%=doc.comment[i].writeDate.toDateString()%>
+                    </span>
+                        <span class="col-md-7" style="font-size: 17px" style="font-size: 14px;">
+                            <%=doc.comment[i].content%>
+                        </span>
+                    <form method="post" action="/delete-comment/<%=doc.id%>">
+                        <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
+                        <% if (doc.comment[i].writerId === userName){%>
+                            <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="X">
+                            <%}%>
+                    </form>
+                  </div>
+                    <%} }%>
+                        <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
+                            <form style="font-size: 18px; margin-bottom: 15px;" method="post" action="/comment">
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="content" placeholder="Write your comment">
+                                    <input type="hidden" name="recipeId" value="<%=doc.id%>">
+                                    <input type='hidden' name='wrtierId' vlaue='<%=userName%>'>
+                                </div>
+                                <button type="submit" class="btn btn-defalut btn-md">덧글 달기</button>
+                            </form>
+                        </div>
+        </div>
 
 
 
 
 
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<!-- /container -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-<script src="/js/client.js"></script>
-</body>
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+        <!-- /container -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    </body>
 
 
-</html>
+    </html>

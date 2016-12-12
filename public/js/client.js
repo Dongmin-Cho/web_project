@@ -41,7 +41,7 @@ $(document).ready(function() { //id 입력란 변경시 유효성 체크
                 url: '/recommend',
                 type: 'POST',
                 data: {
-                    'id': $('#recipe-user-id').html(),
+                    'id': $('#user-id').html(),
                     'recipeId': $('#recipeId').val()
                 },
                 dataType: 'html',
@@ -91,7 +91,7 @@ function signUp() {
             success: function(data) {
                 if (data === 'SUCCESS') {
                     alert('회원가입이 완료되었습니다. 확인을 누르면 메인 페이지로 이동합니다.');
-                    window.location.href = '/test';
+                    window.location.href = '/';
                 } else {
                     alert('오류가 발생했습니다. 다시 시도해주시기 바랍니다.');
                 }
@@ -101,8 +101,8 @@ function signUp() {
 }
 /*when log in, check it is valid*/
 //by jodongmin
-$(document).ready(function() { //DOM이 준비되고
-    $('#btn-login').submit(function() { //문서의 모든 form이 submit될때
+$(document).ready(function() {
+    $('#btn-login').submit(function() {
         if ($('#id').val() === "") {
             alert("아이디를 입력해 주세요.");
             $('#id').focus();
