@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="cd6553e9-a2a0-44bb-b28c-b6ff5aca6c7e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/detailrecipe.ejs" afterPath="$PROJECT_DIR$/views/detailrecipe.ejs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/layout.ejs" afterPath="$PROJECT_DIR$/views/layout.ejs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/createrecipe.ejs" afterPath="$PROJECT_DIR$/views/createrecipe.ejs" />
     </list>
     <ignored path="untitled9.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -40,8 +39,18 @@
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="186">
+            <state relative-caret-position="2238">
               <caret line="266" column="52" selection-start-line="266" selection-start-column="52" selection-end-line="266" selection-end-column="52" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="createrecipe.ejs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/views/createrecipe.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="291">
+              <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -85,16 +94,20 @@
                 <element signature="n#style#0;n#img#0;n#span#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#a#0;n#p#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="e#1918#1925#0#HTML" expanded="true" />
+                <marker date="1481545060000" expanded="true" signature="47:2015" ph="..." />
+                <marker date="1481545060000" expanded="true" signature="55:2006" ph="..." />
+                <marker date="1481545060000" expanded="true" signature="657:782" ph="..." />
+                <marker date="1481545060000" expanded="false" signature="713:757" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="layout.ejs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="layout.ejs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/layout.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
-              <caret line="56" column="33" selection-start-line="56" selection-start-column="33" selection-end-line="56" selection-end-column="33" />
+            <state relative-caret-position="367">
+              <caret line="57" column="10" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
               <folding />
             </state>
           </provider>
@@ -109,6 +122,8 @@
                 <element signature="n#style#0;n#div#0;n#div#1;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <marker date="1481545752000" expanded="true" signature="2056:2166" ph="{...}" />
+                <marker date="1481545752000" expanded="true" signature="2342:2432" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -132,13 +147,13 @@
         <option value="$PROJECT_DIR$/routes/file_controller.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/views/index.ejs" />
-        <option value="$PROJECT_DIR$/views/createrecipe.ejs" />
         <option value="$PROJECT_DIR$/routes/index.js" />
         <option value="$PROJECT_DIR$/routes/mongoose.js" />
         <option value="$PROJECT_DIR$/routes/gridFs.js" />
         <option value="$PROJECT_DIR$/views/main.ejs" />
         <option value="$PROJECT_DIR$/views/detailrecipe.ejs" />
         <option value="$PROJECT_DIR$/views/layout.ejs" />
+        <option value="$PROJECT_DIR$/views/createrecipe.ejs" />
       </list>
     </option>
   </component>
@@ -324,7 +339,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="41719000" />
+    <option name="totallyTimeSpent" value="42976000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1370" height="744" extended-state="0" />
@@ -524,6 +539,8 @@
             <element signature="n#style#0;n#div#0;n#div#1;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <marker date="1481545752000" expanded="true" signature="2056:2166" ph="{...}" />
+            <marker date="1481545752000" expanded="true" signature="2342:2432" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -569,6 +586,10 @@
             <element signature="n#style#0;n#img#0;n#span#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#a#0;n#p#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="e#1918#1925#0#HTML" expanded="true" />
+            <marker date="1481545060000" expanded="true" signature="47:2015" ph="..." />
+            <marker date="1481545060000" expanded="true" signature="55:2006" ph="..." />
+            <marker date="1481545060000" expanded="true" signature="657:782" ph="..." />
+            <marker date="1481545060000" expanded="false" signature="713:757" ph="..." />
           </folding>
         </state>
       </provider>
@@ -705,22 +726,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/createrecipe.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="538">
-          <caret line="110" column="7" selection-start-line="110" selection-start-column="7" selection-end-line="110" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/routes/index.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="266" column="52" selection-start-line="266" selection-start-column="52" selection-end-line="266" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/mongoose.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="566">
@@ -754,6 +759,10 @@
             <element signature="n#style#0;n#img#0;n#span#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#a#0;n#p#0;n#div#2;n#div#0;n#div#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="e#1918#1925#0#HTML" expanded="true" />
+            <marker date="1481545060000" expanded="true" signature="47:2015" ph="..." />
+            <marker date="1481545060000" expanded="true" signature="55:2006" ph="..." />
+            <marker date="1481545060000" expanded="true" signature="657:782" ph="..." />
+            <marker date="1481545060000" expanded="false" signature="713:757" ph="..." />
           </folding>
         </state>
       </provider>
@@ -766,14 +775,32 @@
             <element signature="n#style#0;n#div#0;n#div#1;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <marker date="1481545752000" expanded="true" signature="2056:2166" ph="{...}" />
+            <marker date="1481545752000" expanded="true" signature="2342:2432" ph="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/layout.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="56" column="33" selection-start-line="56" selection-start-column="33" selection-end-line="56" selection-end-column="33" />
+        <state relative-caret-position="367">
+          <caret line="57" column="10" selection-start-line="57" selection-start-column="10" selection-end-line="57" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2238">
+          <caret line="266" column="52" selection-start-line="266" selection-start-column="52" selection-end-line="266" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/createrecipe.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
           <folding />
         </state>
       </provider>
