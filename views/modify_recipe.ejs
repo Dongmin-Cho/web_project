@@ -1,0 +1,81 @@
+<%- include layout.ejs %>
+<html>
+
+<body>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+
+<div class="jumbotron">
+    <div class="container">
+        <h1>레시피 수정</h1>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- 상세보기 -->
+
+    <div class="row">
+        <!-- 상세 타이틀 -->
+
+        <hr />
+    </div>
+
+    <!-- 작성 Form -->
+    <form method="post" action="/recipe-modified">
+        <div class="form-group row">
+            <label for="example-text-input" class="col-xs-2 col-form-label">작성자</label>
+            <div class="col-xs-10">
+                <input class="form-control" type="text" name="userId" id="example-text-input" value='<%=doc.userId%>' readonly/>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="example-search-input" class="col-xs-2 col-form-label">요리 이름</label>
+            <div class="col-xs-10">
+                <input class="form-control" type="text" name="recipeName" value="<%=doc.recipeName%>" id="example-search-input">
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="example-number-input" class="col-xs-2 col-form-label">재료</label>
+            <div class="col-xs-10">
+                <input class="form-control" type="text" name="materials" value="<%=doc.material%>" id="example-number-input">
+
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="example-email-input" class="col-xs-2 col-form-label">조리법</label>
+            <div class="col-xs-10">
+
+                <textarea class="form-control" type="text" name="recipe" value="<%=recipe%>" id="example-email-input"></textarea>
+
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="example-number-input" class="col-xs-2 col-form-label">이미지</label>
+            <div class="col-xs-10">
+                <input class="form-control" type="text" name="image" placeholder="Write URL only when you want to change image" id="example-number-input">
+            </div>
+        </div>
+
+        <div class="col-xs-25">
+            <input type="hidden" name="modified_id" value="<%=doc.id%>">
+            <button type="submit" class="btn btn-success">수정하기</button>
+        </div>
+
+    </form>
+    <!-- /작성 Form -->
+
+
+    <hr>
+
+    <footer>
+        <p><p>
+    </footer>
+</div>
+<!-- /container -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

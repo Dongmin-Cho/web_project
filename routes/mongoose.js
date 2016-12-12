@@ -163,9 +163,32 @@ exports.findALL = function(callback){
 
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
-//이미지 수정이 있는 경우만 분류가 가능한지, 아니면 수정 모듈을 하나 더 만들어야 하는지?
-exports.updateRecipe = function(id, name, recipe, image){
+exports.updateRecipe = function(id, name, recipe, materials, image, gfs, callback){
 
+    var material_array = materials;
+
+//    var count = material_array.length;
+
+//    console.log(material_array[0]);
+
+    Users.update({_id: id}, {$set:{recipeName: name, recipe: recipe, material:materials}},
+        function () {
+            if(image==""){
+                callback(id);
+            }
+            else{
+                gridFs.DeleteFile(id, gfs, function () {
+                    gridFs.imgProcess(image, id, gfs, function () {
+                        console.log('img process done');
+                        Recipes.update({_id: id}, {$set:{image: id}}, function(){
+                            console.log('image name set done');
+                            console.log('image : '+id);
+                            callback(id);
+                        })
+                    })
+                });
+            }
+        })
 };
 
 ////////////////////////////////////////////////////////////
