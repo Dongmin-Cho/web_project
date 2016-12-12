@@ -12,10 +12,10 @@
 				<h1>자취생의 레시피</h1>
 			</div>
 			<div class="col-xs-4">
-				<form method="post" action="/result">
-					<input type="text" name="query" placeholder="Write recipe name here"
+				<form method="get" action="/search">
+					<input type="text" name="searchQuery" placeholder="Write recipe name here"
 						   style="width: 250px; height: 30px">
-					<input type="submit" class="btn btn-primary" value="검색!">
+					<button type="submit" class="btn btn-primary">검색!</button>
 				</form>
 			</div>
 		</div>

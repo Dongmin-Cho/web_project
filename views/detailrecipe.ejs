@@ -1,24 +1,24 @@
 <%- include layout.ejs %>
-<html>
+    <html>
 
-<body>
+    <body>
 
 
-<div class="container-fluid jumbotron" style="margin-top: 25px">
-    <div class="row">
-        <div class="col-xs-4 " style="margin-left: 15px;">
-            <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
-            <div style="margin-top: 80px; font-size: 27px;">작성자 : <i><%=doc.userId%>  </i> </div>
-            <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date.toDateString() %></i> </div>
-        </div>
+        <div class="container-fluid jumbotron" style="margin-top: 25px">
+            <div class="row">
+                <div class="col-xs-4 " style="margin-left: 15px;">
+                    <h1 style="margin-top: 35px"><%=doc.recipeName%></h1>
+                    <div style="margin-top: 80px; font-size: 27px;">작성자 : <i><%=doc.userId%>  </i> </div>
+                    <div style="margin-top: 22px; font-size: 27px;">작성일 : <i><%=doc.date.toDateString() %></i> </div>
+                </div>
 
-        <div class="col-xs-2" style="margin-top:80px ">
-            <p>
-                <input id='recipeId' type="hidden" name="recipeId" value="<%=doc.id%>"></p>
-            <button id='btn-recommend' type="button" class="btn btn-primary btn-lg">추천!</button>
-            </p>
-            <div class="row" style="padding-left:15px; margin-top:100px">
-                <h4>Recommended</h4><span id='recommend-num'><div><h4><strong><%=doc.recommend%></strong> times!</h4></div>
+                <div class="col-xs-2" style="margin-top:80px ">
+                    <p>
+                        <input id='recipeId' type="hidden" name="recipeId" value="<%=doc.id%>"></p>
+                    <button id='btn-recommend' type="button" class="btn btn-primary btn-lg">추천!</button>
+                    </p>
+                    <div class="row" style="padding-left:15px; margin-top:100px">
+                        <h4>Recommended</h4><span id='recommend-num'><div><h4><strong><%=doc.recommend%></strong> times!</h4></div>
             </div>
         </div>
         <div class="col-xs-5">
@@ -68,52 +68,46 @@
     <%
     }
     %>
-</div>
+        </div>
+        <% if (doc.userId === userName){%>
+            <form method="post" action="/delete-recipe/<%=doc.id%>">
+                <input type="hidden" name="userId" value="<%=userName%>">
+                <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="삭제">
+            </form>
+            <%}%>
 
-<div style="margin-bottom: 70px">
-</div>
+                <div>
+                    <h2 style="text-align: left;"><strong>댓글</strong></h2>
 
-<div>
-    <h2 style="text-align: left;"><strong>댓글</strong></h2>
-
-    <% if(doc.comment.length>0){ %>
-    <% for(var i=0; i<doc.comment.length; i++){ %>
-    <div style="width = auto">
-                    <span class="col-md-3 ">
+                    <% if(doc.comment.length>0){ %>
+                        <% for(var i=0; i<doc.comment.length; i++){ %>
+                            <div style="width = auto">
+                                <span class="col-md-3 ">
                       <strong style="font-size: 15px;"><%=doc.comment[i].writerId%> </strong> <%=doc.comment[i].writeDate.toDateString()%>
                     </span>
-        <span class="col-md-7" style="font-size: 17px" style="font-size: 14px;">
+                        <span class="col-md-7" style="font-size: 17px" style="font-size: 14px;">
                             <%=doc.comment[i].content%>
                         </span>
-        <form method="post" action="/delete-comment/<%=doc.id%>">
-            <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
-            <% if (doc.comment[i].writerId === userName){%>
-            <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="X">
-            <%}%>
-        </form>
-    </div>
-    <%} }%>
-    <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
-        <form style="font-size: 18px; margin-bottom: 15px;" method="post" action="/comment">
-            <div class="col-sm-9">
-                <input type="text" class="form-control" name="content" placeholder="Write your comment">
-                <input type="hidden" name="recipeId" value="<%=doc.id%>">
-                <input type='hidden' name='wrtierId' vlaue='<%=userName%>'>
-            </div>
-            <button type="submit" class="btn btn-defalut btn-md">덧글 달기</button>
-        </form>
-    </div>
-</div>
+                        <form method="post" action="/delete-comment/<%=doc.id%>">
+                            <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
+                            <% if (doc.comment[i].writerId === userName){%>
+                                <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="X">
+                                <%}%>
+                        </form>
+                    </div>
+                    <%} }%>
+                        <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
+                            <form style="font-size: 18px; margin-bottom: 15px;" method="post" action="/comment">
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="content" placeholder="Write your comment">
+                                    <input type="hidden" name="recipeId" value="<%=doc.id%>">
+                                    <input type='hidden' name='wrtierId' vlaue='<%=userName%>'>
+                                </div>
+                                <button type="submit" class="btn btn-defalut btn-md">덧글 달기</button>
+                            </form>
+                        </div>
+                </div>
 
+    </body>
 
-
-
-
-<!-- Main jumbotron for a primary marketing message or call to action -->
-<!-- /container -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-</body>
-
-
-</html>
+    </html>
