@@ -176,6 +176,8 @@ exports.searchRecipes = function(param,callback){
       callback(out);
   });
 };
+
+
 ////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////레시피 수정
 exports.updateRecipe = function(id, name, recipe, materials, image, gfs, callback){
@@ -186,12 +188,16 @@ exports.updateRecipe = function(id, name, recipe, materials, image, gfs, callbac
 
 //    console.log(material_array[0]);
 
-    Users.update({_id: id}, {$set:{recipeName: name, recipe: recipe, material:materials}},
+    console.log('updateRecipe] _id: '+id);
+
+    Recipes.update({_id: id}, {$set:{recipeName: name, recipe: recipe, material:materials}},
         function () {
             if(image==""){
+                console.log('updateRecipe] no change image');
                 callback(id);
             }
             else{
+                console.log('updateRecipe] image change start');
                 gridFs.DeleteFile(id, gfs, function () {
                     gridFs.imgProcess(image, id, gfs, function () {
                         console.log('img process done');

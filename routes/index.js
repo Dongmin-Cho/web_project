@@ -291,7 +291,9 @@ router.post('/logout', function(req, res) {
 
 
 router.post('/modify-recipe', function (req, res, next) {
+    console.log('modify page entered');
     var recipeId = req.body.delRecipeId;
+    console.log('modified recipe id: '+recipeId);
 
     customMongoose.findDocByID(recipeId, function(doc){
         if(doc.userId==req.session.userId || req.session.userId=='admin') {
@@ -308,9 +310,11 @@ router.post('/recipe-modified', function (req, res, next) {
 
     //var userId = req.body.userId;
     var recipeId = req.body.modified_id;
+    console.log('modify start: '+recipeId);
     var recipeName = req.body.recipeName;
     var recipe = req.body.recipe;
     var imageURL = req.body.image;
+
     var materals = req.body.materials;
     var mAry = materals.split(',');
 
@@ -318,17 +322,14 @@ router.post('/recipe-modified', function (req, res, next) {
     //console.log('userId: '+userId);
     console.log('session Id: '+req.session.userId);
 
-    var str = recipe.split('\r\n');
-
-    console.log('modify str: '+str[0]);
-
-    customMongoose.updateRecipe(recipeId, recipeName, str, mAry, imageURL, gfs, function (id) {
-        console.log('uploadRecipe check');
-        res.redirect('/recipe/'+id);
+    customMongoose.updateRecipe(recipeId, recipeName, recipe, mAry, imageURL, gfs, function (id) {
+        console.log('modify check');
+        res.redirect('/recipe/'+recipeId);
         //res.render('detailrecipe', {});
         //res.send('well done id: ' +id);
     });
 
 });
+
 
 module.exports = router;
