@@ -19,82 +19,98 @@
                     </p>
                     <div class="row" style="padding-left:15px; margin-top:100px">
                         <h4>Recommended</h4><span id='recommend-num'><div><h4><strong><%=doc.recommend%></strong> times!</h4></div>
-            </div>
-        </div>
-        <div class="col-xs-5">
-            <a data-toggle="modal" data-target="#myModal">
+                    </div>
+                </div>
+                <div class="col-xs-5">
+                    <a data-toggle="modal" data-target="#myModal">
                 <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px" >
             </a>
 
-            <!-- 모달 팝업 -->
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px">
+                    <!-- 모달 팝업 -->
+                    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <img src="data:image/jpeg;base64, <%=img%>" style="width:400px; height:300px">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+
+        <div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h2 style="text-align: left;"><strong>재료</strong></h2>
+                    </div>
+                    <div class="col-xs-6" style="text-align: right">
+                        <% if (doc.userId === userName){%>
+                        <form method="post" action="/modify-recipe">
+                            <input type="submit" class="btn btn-default btn-sm" value="레시피 수정!">
+                            <input type="hidden" name="delRecipeId" value=<%=doc.id%>>
+                        </form>
+
+                        <form method="post" action="/delete-recipe/<%=doc.id%>">
+                            <input type="hidden" name="userId" value="<%=userName%>">
+                            <input type="submit" class='btn btn-default' value="삭제">
+                        </form>
+                        <%}%>
                     </div>
                 </div>
             </div>
-
-
-        </div>
-
-    </div>
-</div>
-
-<div>
-    <h2 style="text-align: left;"><strong>재료</strong></h2>
-    <div>
-        <%
+            <div>
+                <%
         for(var m=0;m<doc.material.length;m++){
         %>
-        <button class="btn btn-warning btn-sm"><%=doc.material[m]%></button>
-        <%
+                    <button class="btn btn-warning btn-sm"><%=doc.material[m]%></button>
+                    <%
         }
         %>
-    </div>
-    <div style="margin-bottom: 70px">
-    </div>
-    <h2 style="text-align: left;"><strong>조리법</strong></h2>
-    <% for(var s=0; s<recipeStr.length; s++){
+            </div>
+            <div style="margin-bottom: 70px">
+                </div>
+            <h2 style="text-align: left;"><strong>조리법</strong></h2>
+            <% for(var s=0; s<recipeStr.length; s++){
     %>
-    <p style="font-size : 18px;">
-        <%=recipeStr[s]%>
-    </p>
-    <%
+                <p style="font-size : 18px;">
+                    <%=recipeStr[s]%>
+                </p>
+                <%
     }
     %>
         </div>
-        <% if (doc.userId === userName){%>
-            <form method="post" action="/delete-recipe/<%=doc.id%>">
-                <input type="hidden" name="userId" value="<%=userName%>">
-                <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="삭제">
-            </form>
-            <%}%>
 
-                <div>
-                    <h2 style="text-align: left;"><strong>댓글</strong></h2>
+        <div style="margin-bottom: 70px">
+        </div>
 
-                    <% if(doc.comment.length>0){ %>
-                        <% for(var i=0; i<doc.comment.length; i++){ %>
-                            <div style="width = auto">
-                                <span class="col-md-3 ">
+        <div>
+            <h2 style="text-align: left;"><strong>댓글</strong></h2>
+
+            <% if(doc.comment.length>0){ %>
+                <% for(var i=0; i<doc.comment.length; i++){ %>
+                  <div style="width = auto">
+                    <span class="col-md-3 ">
                       <strong style="font-size: 15px;"><%=doc.comment[i].writerId%> </strong> <%=doc.comment[i].writeDate.toDateString()%>
                     </span>
                         <span class="col-md-7" style="font-size: 17px" style="font-size: 14px;">
                             <%=doc.comment[i].content%>
                         </span>
-                        <form method="post" action="/delete-comment/<%=doc.id%>">
-                            <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
-                            <% if (doc.comment[i].writerId === userName){%>
-                                <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="X">
-                                <%}%>
-                        </form>
-                    </div>
+                    <form method="post" action="/delete-comment/<%=doc.id%>">
+                        <input type="hidden" name="deleteCommentId" value="<%=doc.comment[i].id%>">
+                        <% if (doc.comment[i].writerId === userName){%>
+                            <input type="submit" class="col-md-1 btn btn-danger btn-sm" value="X">
+                            <%}%>
+                    </form>
+                  </div>
                     <%} }%>
                         <div class="col-md-8 col-md-offset-3" style="margin-top: 15px;">
                             <form style="font-size: 18px; margin-bottom: 15px;" method="post" action="/comment">
@@ -106,8 +122,17 @@
                                 <button type="submit" class="btn btn-defalut btn-md">덧글 달기</button>
                             </form>
                         </div>
-                </div>
+        </div>
 
+
+
+
+
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+        <!-- /container -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     </body>
+
 
     </html>

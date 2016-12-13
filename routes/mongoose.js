@@ -4,7 +4,6 @@
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 ObjectID = require('mongodb').ObjectID;
-var textSearch = require('mongoose-text-search');
 var gridFs = require('./gridFs');
 
 //사용자 스키마
@@ -34,12 +33,6 @@ var RecipeSchema = mongoose.Schema({
         content : String,
         writeDate : {type: Date, default: Date.now}}],
     image : {type: String, default: defaultImage} // 이미지의 파일 이름(레시피 이름으로 저장)
-});
-RecipeSchema.plugin(textSearch);
-
-RecipeSchema.index({
-  material:'text',
-  recipeName:'text'
 });
 
 var Recipes = mongoose.model('Recipes', RecipeSchema);

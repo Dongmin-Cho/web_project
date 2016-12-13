@@ -50,7 +50,7 @@ $(document).ready(function() { //id 입력란 변경시 유효성 체크
                         if (data === 'FAILED') {
                           alert('이미 추천하셨습니다.');
                         } else {
-                            $('#recommend-num').html('<b style="font-style: normal;">'+data+'<b>');
+                            $('#recommend-num').html('<b style="font-style: normal; font-size:20px">'+data+'times!<b>');
                         }
                     } //end success function
             });

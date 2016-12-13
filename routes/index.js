@@ -118,8 +118,9 @@ router.get('/recipe-insert', function(req, res, next){
 });
 
 router.post('/delete-recipe/:id', function (req, res) {
-  var recipeId = req.body.id;
+  var recipeId = req.params.id;
   var userId = req.body.userId;
+  console.log(recipeId);
   customMongoose.deleteRecipe(userId,recipeId,function(){
     res.redirect('/');
   });
